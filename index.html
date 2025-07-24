@@ -208,18 +208,33 @@
 
         const data = await res.json();
         if (data.result === "success") {
-          document.getElementById("success-message").style.display = "block";
-          e.target.reset();
-          setTimeout(() => {
-            document.getElementById("success-message").style.display = "none";
-          }, 5000);
-        } else {
-          alert("❌ त्रुटि: " + data.error);
-        }
-      } catch (err) {
-        alert("❌ नेटवर्क त्रुटि");
-      }
+          document.getElementById("entryForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const json = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch("YOUR_SCRIPT_URL_HERE", {
+      method: "POST",
+      body: new URLSearchParams(json)
     });
+
+    const data = await res.json();
+    if (data.result === "success") {
+      document.getElementById("success-message").style.display = "block";
+      e.target.reset();
+      document.getElementById("photo-status").innerText = ""; // ✅ फोटो स्टेटस हटाओ
+      setTimeout(() => {
+        document.getElementById("success-message").style.display = "none";
+      }, 5000);
+    } else {
+      alert("❌ त्रुटि: " + data.error);
+    }
+  } catch (err) {
+    alert("❌ नेटवर्क त्रुटि");
+  }
+});
+
 
     startCamera();
   </script>
