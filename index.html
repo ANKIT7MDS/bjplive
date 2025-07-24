@@ -155,13 +155,21 @@
   const statusMsg = document.getElementById('statusMessage');
   const form = document.getElementById('myForm');
 
-  navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-    video.srcObject = stream;
-  }).catch(err => {
-    console.error("कैमरा एरर:", err);
-    alert("कैमरा चालू नहीं हो पाया! अनुमति दें या ब्राउज़र बदलें।");
+  // ✅ कैमरा स्टार्ट करना
+  window.addEventListener("load", () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        video.srcObject = stream;
+      }).catch(err => {
+        console.error("कैमरा एरर:", err);
+        alert("📸 कैमरा चालू नहीं हो पाया! कृपया अनुमति दें या HTTPS से खोलें।");
+      });
+    } else {
+      alert("❌ कैमरा आपके ब्राउज़र में सपोर्ट नहीं है।");
+    }
   });
 
+  // ✅ फोटो कैप्चर करना
   captureBtn.addEventListener('click', () => {
     const context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -172,11 +180,12 @@
     statusMsg.textContent = "✅ फोटो कैप्चर हो गया है।";
   });
 
+  // ✅ Form सबमिट को रोककर AJAX से भेजना
   form.addEventListener('submit', function(e) {
-    e.preventDefault(); // Default submit रोकें
+    e.preventDefault(); // 🚫 default redirect रोके
 
     if (!selfieInput.value) {
-      alert("कृपया पहले फोटो कैप्चर करें 📸");
+      alert("📸 कृपया पहले फोटो कैप्चर करें");
       return;
     }
 
@@ -189,23 +198,26 @@
       body: formData
     })
     .then(res => res.json())
-    ..then(data => {
-  if (data.result === "success") {
-    statusMsg.textContent = "🎉 धन्यवाद! आपका फॉर्म सफलतापूर्वक सबमिट हुआ।";
-    form.reset(); // 💥 पूरा फॉर्म रीसेट हो जाएगा
-    preview.src = "";
-    selfieInput.value = "";
-    setTimeout(() => {
-      statusMsg.textContent = "";
-    }, 4000);
-  } else {
-    statusMsg.textContent = "❌ त्रुटि हुई! कृपया पुनः प्रयास करें।";
-  }
-})
-
+    .then(data => {
+      if (data.result === "success") {
+        statusMsg.textContent = "🎉 धन्यवाद! आपका फॉर्म सफलतापूर्वक सबमिट हुआ।";
+        form.reset();
+        selfieInput.value = "";
+        preview.src = "";
+        setTimeout(() => {
+          statusMsg.textContent = "";
+        }, 4000);
+      } else {
+        statusMsg.textContent = "❌ त्रुटि हुई! कृपया पुनः प्रयास करें।";
+      }
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      statusMsg.textContent = "❌ नेटवर्क समस्या! सबमिट नहीं हो पाया।";
     });
   });
 </script>
+
 
 
 </body>
