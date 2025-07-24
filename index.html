@@ -92,9 +92,8 @@
     form.addEventListener("submit", async e => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form));
-      console.log("Sending:", data);
       try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbzqXIrTcsAwILQ2d16d8hy6WUVv64k1etE5USI_Py6MM0rx64_b4LOSRpH06FgLL0xb/exec", {
+        const res = await fetch("https://script.google.com/macros/s/AKfycby8BIM3wiqg2h0jEz-wy9WfJJ4QljNZdnuGBFcFiB5YeWXEU6dQfXXzus914gw2HYUsOQ/exec", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
           body:JSON.stringify(data)
