@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>भाजपा आगंतुक फॉर्म</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #fff4e6; display: flex; justify-content: center; align-items: center; height: auto; padding:20px; margin:0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #fff4e6; display: flex; justify-content: center; align-items: center; padding:20px; margin:0; }
     .container { background: #ff7700; color: white; padding: 25px; border-radius: 10px; width:100%; max-width:550px; box-shadow:0 0 20px rgba(0,0,0,0.2); }
     h2 { text-align: center; margin-bottom:15px; }
     label { display:block; margin:10px 0 5px; }
@@ -21,25 +21,46 @@
   <div class="container">
     <h2>📝 आगंतुक फॉर्म</h2>
     <form id="entryForm">
-      <label>मोबाइल नंबर*</label><input type="tel" name="mobile" required>
-      <label>नाम*</label><input type="text" name="name" required>
-      <label>पद</label><input type="text" name="position">
+      <label>मोबाइल नंबर*</label>
+      <input type="tel" name="mobile" required>
+      <label>नाम*</label>
+      <input type="text" name="name" required>
+      <label>पद</label>
+      <input type="text" name="position">
+      
       <label>मंडल*</label>
       <select name="mandal" required>
         <option value="">मंडल चुनें</option>
-        <option>BHENSDOA</option><option>भानपुरा</option><option>गरोठ</option><option>MELKHEDA</option><option>KHADAVADA</option><option>शामगढ़</option><option>सुवासरा</option><option>BASAI</option><option>सीतामऊ ग्रामीण</option><option>सीतामऊ</option><option>क्यामपुर</option><option>गुर्जरबरडिया</option><option>धुनधड़का</option><option>पिपलिया मंडी</option><option>बुडा</option><option>मल्हारगढ़</option><option>दलोदा</option><option>मंदसौर ग्रामीण</option><option>मगरामाता जी</option><option>मंदसौर दक्षिण</option><option>मंदसौर उत्तर</option><option>अन्य जिला</option>
+        <option>भानपुरा</option><option>गरोठ</option><option>शामगढ़</option><option>सुवासरा</option><option>सीतामऊ</option>
+        <option>सीतामऊ ग्रामीण</option><option>पिपलिया मंडी</option><option>मल्हारगढ़</option><option>मंदसौर उत्तर</option>
+        <option>मंदसौर दक्षिण</option><option>मंदसौर ग्रामीण</option><option>दलोदा</option><option>मगरामाता जी</option>
+        <option>गुर्जरबरडिया</option><option>बुडा</option><option>BASAI</option><option>क्यामपुर</option><option>धुनधड़का</option>
+        <option>MELKHEDA</option><option>KHADAVADA</option><option>BHENSDOA</option><option>अन्य जिला</option>
       </select>
-      <label>पता/बूथ*</label><textarea name="address" required></textarea>
+
+      <label>पता/बूथ*</label>
+      <textarea name="address" required></textarea>
+
       <label>आगमन का उद्देश्य*</label>
       <select name="purpose" required>
         <option value="">चयन करें</option>
-        <option>Personal Reason</option><option>Organizational Visit</option><option>Meet District President</option><option>Transfer / Complaint / Application</option><option>For Office Meeting / Mandsaur Meeting</option><option>Other Topic</option>
+        <option>व्यक्तिगत कारण</option>
+        <option>संगठनात्मक यात्रा</option>
+        <option>जिला अध्यक्ष से मिलना</option>
+        <option>स्थानांतरण / शिकायत / आवेदन</option>
+        <option>कार्यालय/मंदसौर बैठक</option>
+        <option>कार्यकर्ता मुलाकात</option>
+        <option>जनसमस्या का समाधान</option>
+        <option>चुनावी चर्चा</option>
+        <option>अन्य विषय</option>
       </select>
+
       <label>सेल्फी*</label>
       <video id="camera" autoplay></video>
       <button type="button" onclick="takePhoto()">📸 फोटो लें</button>
       <img id="preview" src="" alt="Preview" style="display:none;"/>
       <input type="hidden" name="selfieData" id="selfieData">
+
       <button type="submit">सबमिट करें</button>
     </form>
   </div>
@@ -79,7 +100,6 @@
           body:JSON.stringify(data)
         });
         const json = await res.json();
-        console.log("Response:", json);
         if(json.status==="success"){
           popup.style.display="block";
           setTimeout(()=>popup.style.display="none",4000);
