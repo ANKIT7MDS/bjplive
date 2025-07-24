@@ -22,14 +22,15 @@
       padding: 30px;
       border-radius: 12px;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      position: relative;
     }
 
-    .form-box h2 {
+    .form-box h2, .form-box h3 {
       color: #e65100;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     label {
@@ -66,24 +67,36 @@
       background: #bf360c;
     }
 
-    #popup {
-      position: fixed;
-      top: 20px;
-      right: 20px;
+    #photo-status {
+      color: green;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #success-message {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: #4caf50;
       color: white;
-      padding: 14px 20px;
-      border-radius: 6px;
-      font-size: 16px;
-      display: none;
-      z-index: 1000;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 999;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
     }
 
     video, canvas {
       width: 100%;
       max-height: 200px;
-      margin-bottom: 10px;
       border-radius: 8px;
+      margin-bottom: 8px;
       background: #ccc;
     }
   </style>
@@ -91,13 +104,15 @@
 <body>
 
   <div class="form-box">
-    <h2>आगमन पंजीकरण</h2>
-    <form id="entryForm">
-      <label>नाम</label>
-      <input type="text" name="नाम" required>
+    <h2>भाजपा कार्यालय पर आपका स्वागत है</h2>
+    <h3>आगन्तुक पंजीयन</h3>
 
+    <form id="entryForm">
       <label>मोबाइल नंबर</label>
       <input type="tel" name="मोबाइल नंबर" required>
+
+      <label>नाम</label>
+      <input type="text" name="नाम" required>
 
       <label>पद</label>
       <input type="text" name="पद">
@@ -144,14 +159,18 @@
       <label>कैमरा से सेल्फी</label>
       <video id="video" autoplay playsinline></video>
       <button type="button" onclick="capturePhoto()">📸 फोटो लें</button>
+      <div id="photo-status"></div>
+
       <canvas id="canvas" style="display:none;"></canvas>
       <input type="hidden" name="Selfie" id="selfieData">
 
       <button type="submit">सबमिट करें</button>
     </form>
-  </div>
 
-  <div id="popup">✅ सबमिट सफल!</div>
+    <div id="success-message">
+      ✅ आपका फॉर्म सफलतापूर्वक सबमिट हुआ <br> भाजपा कार्यालय पर आपका हार्दिक स्वागत है
+    </div>
+  </div>
 
   <script>
     const video = document.getElementById("video");
@@ -173,15 +192,7 @@
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL("image/png");
       document.getElementById("selfieData").value = imageData;
-      alert("✅ फोटो कैप्चर हो गई है");
-    }
-
-    function showPopup(msg, error = false) {
-      const popup = document.getElementById("popup");
-      popup.innerText = msg;
-      popup.style.background = error ? "#f44336" : "#4caf50";
-      popup.style.display = "block";
-      setTimeout(() => popup.style.display = "none", 4000);
+      document.getElementById("photo-status").innerText = "✅ फोटो कैप्चर हो गई है";
     }
 
     document.getElementById("entryForm").addEventListener("submit", async function(e) {
@@ -197,13 +208,16 @@
 
         const data = await res.json();
         if (data.result === "success") {
-          showPopup("✅ सबमिट सफल!");
+          document.getElementById("success-message").style.display = "block";
           e.target.reset();
+          setTimeout(() => {
+            document.getElementById("success-message").style.display = "none";
+          }, 5000);
         } else {
-          showPopup("❌ त्रुटि: " + data.error, true);
+          alert("❌ त्रुटि: " + data.error);
         }
       } catch (err) {
-        showPopup("❌ नेटवर्क त्रुटि", true);
+        alert("❌ नेटवर्क त्रुटि");
       }
     });
 
