@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <title>आगमन पंजीकरण</title>
   <style>
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
       padding: 0;
@@ -34,10 +32,10 @@
     }
 
     label {
-      color: #bf360c;
       font-weight: bold;
       margin-top: 12px;
       display: block;
+      color: #bf360c;
     }
 
     input, select, textarea {
@@ -58,21 +56,26 @@
       border: none;
       font-weight: bold;
       border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
       font-size: 16px;
+      cursor: pointer;
     }
 
     button:hover {
       background: #bf360c;
     }
 
+    video, canvas {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
     #photo-status {
       color: green;
       font-weight: bold;
       font-size: 14px;
-      margin-bottom: 10px;
       text-align: center;
+      margin-bottom: 10px;
     }
 
     #success-message {
@@ -88,155 +91,132 @@
       font-size: 18px;
       font-weight: bold;
       text-align: center;
-      z-index: 999;
       box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-    }
-
-    video, canvas {
-      width: 100%;
-      max-height: 200px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      background: #ccc;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
 
-  <div class="form-box">
-    <h2>भाजपा कार्यालय पर आपका स्वागत है</h2>
-    <h3>आगन्तुक पंजीयन</h3>
+<div class="form-box">
+  <h2>भाजपा कार्यालय पर आपका स्वागत है</h2>
+  <h3>आगन्तुक पंजीयन</h3>
 
-    <form id="entryForm">
-      <label>मोबाइल नंबर</label>
-      <input type="tel" name="मोबाइल नंबर" required>
+  <form id="entryForm" onsubmit="return false;">
+    <label>मोबाइल नंबर</label>
+    <input type="tel" name="मोबाइल नंबर" required>
 
-      <label>नाम</label>
-      <input type="text" name="नाम" required>
+    <label>नाम</label>
+    <input type="text" name="नाम" required>
 
-      <label>पद</label>
-      <input type="text" name="पद">
+    <label>पद</label>
+    <input type="text" name="पद">
 
-      <label>मंडल</label>
-      <select name="मंडल" required>
-        <option value="">-- चयन करें --</option>
-        <option>भेंसोदा</option>
-        <option>भानपुरा</option>
-        <option>गरोठ</option>
-        <option>मेलखेड़ा</option>
-        <option>खड़ावदा</option>
-        <option>शामगढ़</option>
-        <option>सुवासरा</option>
-        <option>बसाई</option>
-        <option>सीतामऊ ग्रामीण</option>
-        <option>सीतामऊ</option>
-        <option>क्यांपुरे</option>
-        <option>गुर्जरबर्डिया</option>
-        <option>धुंधड़का</option>
-        <option>पिपलिया मंडी</option>
-        <option>बूढ़ा</option>
-        <option>मल्हारगढ़</option>
-        <option>दलोदा</option>
-        <option>मगरामता जी</option>
-        <option>मंदसौर ग्रामीण</option>
-        <option>मंदसौर दक्षिण</option>
-        <option>मंदसौर उत्तर</option>
-      </select>
+    <label>मंडल</label>
+    <select name="मंडल" required>
+      <option value="">-- चयन करें --</option>
+      <option>भेंसोदा</option>
+      <option>भानपुरा</option>
+      <option>गरोठ</option>
+      <option>मेलखेड़ा</option>
+      <option>खड़ावदा</option>
+      <option>शामगढ़</option>
+      <option>सुवासरा</option>
+      <option>बसाई</option>
+      <option>सीतामऊ ग्रामीण</option>
+      <option>सीतामऊ</option>
+      <option>क्यांपुरे</option>
+      <option>गुर्जरबर्डिया</option>
+      <option>धुंधड़का</option>
+      <option>पिपलिया मंडी</option>
+      <option>बूढ़ा</option>
+      <option>मल्हारगढ़</option>
+      <option>दलोदा</option>
+      <option>मगरामता जी</option>
+      <option>मंदसौर ग्रामीण</option>
+      <option>मंदसौर दक्षिण</option>
+      <option>मंदसौर उत्तर</option>
+    </select>
 
-      <label>बूथ / वार्ड / पता</label>
-      <textarea name="बूथ / वार्ड / पता" rows="2"></textarea>
+    <label>बूथ / वार्ड / पता</label>
+    <textarea name="बूथ / वार्ड / पता" rows="2"></textarea>
 
-      <label>आने का कारण</label>
-      <select name="आने का कारण" required>
-        <option value="">-- कारण चुनें --</option>
-        <option>कार्यालय पर बैठक में</option>
-        <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेट</option>
-        <option>ट्रांसफर या अन्य कोई शासकीय कार्य /शिकायत</option>
-        <option>कार्यालय पर  सामान्य उपस्थिति</option>
-        <option>अन्य कोई कार्य</option>
-      </select>
+    <label>आने का कारण</label>
+    <select name="आने का कारण" required>
+      <option value="">-- कारण चुनें --</option>
+      <option>कार्यालय पर बैठक में</option>
+      <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेट</option>
+      <option>ट्रांसफर या अन्य कोई शासकीय कार्य /शिकायत</option>
+      <option>कार्यालय पर  सामान्य उपस्थिति</option>
+      <option>अन्य कोई कार्य</option>
+    </select>
 
-      <label>कैमरा से सेल्फी</label>
-      <video id="video" autoplay playsinline></video>
-      <button type="button" onclick="capturePhoto()">📸 फोटो लें</button>
-      <div id="photo-status"></div>
+    <label>कैमरा से सेल्फी</label>
+    <video id="video" autoplay playsinline></video>
+    <button type="button" onclick="capturePhoto()">📸 फोटो लें</button>
+    <div id="photo-status"></div>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <input type="hidden" name="Selfie" id="selfieData">
 
-      <canvas id="canvas" style="display:none;"></canvas>
-      <input type="hidden" name="Selfie" id="selfieData">
+    <button type="submit" onclick="submitForm()">सबमिट करें</button>
+  </form>
 
-      <button type="submit">सबमिट करें</button>
-    </form>
+  <div id="success-message">✅ आपका फॉर्म सफलतापूर्वक सबमिट हुआ<br>भाजपा कार्यालय पर आपका हार्दिक स्वागत है</div>
+</div>
 
-    <div id="success-message">
-      ✅ आपका फॉर्म सफलतापूर्वक सबमिट हुआ <br> भाजपा कार्यालय पर आपका हार्दिक स्वागत है
-    </div>
-  </div>
+<script>
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
 
-  <script>
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-      } catch (err) {
-        alert("❌ कैमरा चालू नहीं हो पाया: " + err.message);
-      }
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+    } catch (err) {
+      alert("❌ कैमरा चालू नहीं हो पाया: " + err.message);
     }
-
-    function capturePhoto() {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL("image/png");
-      document.getElementById("selfieData").value = imageData;
-      document.getElementById("photo-status").innerText = "✅ फोटो कैप्चर हो गई है";
-    }
-
-    document.getElementById("entryForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const json = Object.fromEntries(formData.entries());
-
-      try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec", {
-          method: "POST",
-          body: new URLSearchParams(json)
-        });
-
-        const data = await res.json();
-        if (data.result === "success") {
-          document.getElementById("entryForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const json = Object.fromEntries(formData.entries());
-
-  try {
-    const res = await fetch("YOUR_SCRIPT_URL_HERE", {
-      method: "POST",
-      body: new URLSearchParams(json)
-    });
-
-    const data = await res.json();
-    if (data.result === "success") {
-      document.getElementById("success-message").style.display = "block";
-      e.target.reset();
-      document.getElementById("photo-status").innerText = ""; // ✅ फोटो स्टेटस हटाओ
-      setTimeout(() => {
-        document.getElementById("success-message").style.display = "none";
-      }, 5000);
-    } else {
-      alert("❌ त्रुटि: " + data.error);
-    }
-  } catch (err) {
-    alert("❌ नेटवर्क त्रुटि");
   }
-});
 
+  function capturePhoto() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const img = canvas.toDataURL("image/png");
+    document.getElementById("selfieData").value = img;
+    document.getElementById("photo-status").innerText = "✅ फोटो कैप्चर हो गई है";
+  }
 
-    startCamera();
-  </script>
+  async function submitForm() {
+    const form = document.getElementById("entryForm");
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch("https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec", {
+        method: "POST",
+        body: new URLSearchParams(data)
+      });
+
+      const result = await res.json();
+
+      if (result.result === "success") {
+        document.getElementById("success-message").style.display = "block";
+        form.reset();
+        document.getElementById("photo-status").innerText = "";
+        setTimeout(() => {
+          document.getElementById("success-message").style.display = "none";
+        }, 5000);
+      } else {
+        alert("❌ त्रुटि: " + result.error);
+      }
+    } catch (err) {
+      alert("❌ नेटवर्क त्रुटि: " + err.message);
+    }
+  }
+
+  startCamera();
+</script>
+
 </body>
 </html>
