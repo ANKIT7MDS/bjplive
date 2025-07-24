@@ -1,4 +1,4 @@
-const url = 'YOUR_GOOGLE_WEBAPP_URL'; // <-- इसे अपने actual Apps Script URL से बदलें
+const url = 'https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec'; // <-- इसे अपने actual Apps Script URL से बदलें
 
 const mandalList = [
   'भेन्सोदा','भानपुरा','गरोड़','मेलखेड़ा','खादवदा','शामगढ़','सुवासरा','बसई',
