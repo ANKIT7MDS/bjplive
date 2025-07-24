@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKXYZ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec';
 
 let table;
 
