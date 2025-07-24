@@ -190,7 +190,7 @@
       const json = Object.fromEntries(formData.entries());
 
       try {
-        const res = await fetch("YOUR_SCRIPT_URL_HERE", {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec", {
           method: "POST",
           body: new URLSearchParams(json)
         });
