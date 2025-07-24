@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>भाजपा आगंतुक फॉर्म</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #fff4e6; display: flex; justify-content: center; align-items: center; height: auto; padding:20px; margin:0; }
+    .container { background: #ff7700; color: white; padding: 25px; border-radius: 10px; width:100%; max-width:550px; box-shadow:0 0 20px rgba(0,0,0,0.2); }
+    h2 { text-align: center; margin-bottom:15px; }
+    label { display:block; margin:10px 0 5px; }
+    input, select, textarea, button { width:100%; padding:10px; border:none; border-radius:5px; margin-bottom:15px; font-size:16px; }
+    button { background:#ffa500; color:white; cursor:pointer; }
+    button:hover { background:#e67300; }
+    video, img { display:block; width:120px; height:120px; margin:10px auto; object-fit:cover; border-radius:5px; }
+    .popup { display:none; position:fixed; top:25%; left:50%; transform:translate(-50%,-50%); background:#28a745; padding:20px; color:white; border-radius:8px; font-size:18px; z-index:10; box-shadow:0 0 10px rgba(0,0,0,0.4); }
+  </style>
+</head>
+<body>
+  <div class="popup" id="popup">✅ आपकी प्रविष्टि सफलतापूर्वक भेजी गई है!</div>
+  <div class="container">
+    <h2>📝 आगंतुक फॉर्म</h2>
+    <form id="entryForm">
+      <label>मोबाइल नंबर*</label><input type="tel" name="mobile" required>
+      <label>नाम*</label><input type="text" name="name" required>
+      <label>पद</label><input type="text" name="position">
+      <label>मंडल*</label>
+      <select name="mandal" required>
+        <option value="">मंडल चुनें</option>
+        <option>BHENSDOA</option><option>भानपुरा</option><option>गरोठ</option><option>MELKHEDA</option><option>KHADAVADA</option><option>शामगढ़</option><option>सुवासरा</option><option>BASAI</option><option>सीतामऊ ग्रामीण</option><option>सीतामऊ</option><option>क्यामपुर</option><option>गुर्जरबरडिया</option><option>धुनधड़का</option><option>पिपलिया मंडी</option><option>बुडा</option><option>मल्हारगढ़</option><option>दलोदा</option><option>मंदसौर ग्रामीण</option><option>मगरामाता जी</option><option>मंदसौर दक्षिण</option><option>मंदसौर उत्तर</option><option>अन्य जिला</option>
+      </select>
+      <label>पता/बूथ*</label><textarea name="address" required></textarea>
+      <label>आगमन का उद्देश्य*</label>
+      <select name="purpose" required>
+        <option value="">चयन करें</option>
+        <option>Personal Reason</option><option>Organizational Visit</option><option>Meet District President</option><option>Transfer / Complaint / Application</option><option>For Office Meeting / Mandsaur Meeting</option><option>Other Topic</option>
+      </select>
+      <label>सेल्फी*</label>
+      <video id="camera" autoplay></video>
+      <button type="button" onclick="takePhoto()">📸 फोटो लें</button>
+      <img id="preview" src="" alt="Preview" style="display:none;"/>
+      <input type="hidden" name="selfieData" id="selfieData">
+      <button type="submit">सबमिट करें</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("entryForm"),
+          popup = document.getElementById("popup"),
+          preview = document.getElementById("preview"),
+          selfieData = document.getElementById("selfieData"),
+          camera = document.getElementById("camera");
+
+    navigator.mediaDevices.getUserMedia({video:true})
+      .then(s => camera.srcObject = s)
+      .catch(e => { alert("कैमरा उपलब्ध नहीं हुआ"); console.error(e); });
+
+    function takePhoto(){
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 200; canvas.height = 200;
+        canvas.getContext("2d").drawImage(camera, 0, 0, 200, 200);
+        const img = canvas.toDataURL("image/jpeg");
+        preview.src = img; preview.style.display = "block"; selfieData.value = img;
+      } catch(err){
+        alert("सेल्फी लेने में त्रुटि");
+        console.error(err);
+      }
+    }
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      console.log("Sending:", data);
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbzqXIrTcsAwILQ2d16d8hy6WUVv64k1etE5USI_Py6MM0rx64_b4LOSRpH06FgLL0xb/exec", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(data)
+        });
+        const json = await res.json();
+        console.log("Response:", json);
+        if(json.status==="success"){
+          popup.style.display="block";
+          setTimeout(()=>popup.style.display="none",4000);
+          form.reset(); preview.style.display="none";
+        } else {
+          alert("सर्वर त्रुटि: "+json.message);
+        }
+      } catch(err){
+        alert("त्रुटि: फॉर्म सबमिट नहीं हो पाया");
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
