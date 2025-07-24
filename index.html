@@ -122,6 +122,9 @@
       const dataURL = canvas.toDataURL('image/png');
       selfieInput.value = dataURL;
       photoStatus.textContent = "✅ फोटो कैप्चर हो गई है";
+      console.log("📸 Captured: ", imageData);
+console.log("✅ SelfieInput Value: ", document.getElementById('selfieInput').value);
+
 
       preview.src = dataURL;
       preview.style.display = "block";
