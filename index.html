@@ -5,7 +5,7 @@
   <title>आगंतुक फॉर्म</title>
   <style>
     body {
-      background: #ffecb3;
+      background: #ffe0b2;
       font-family: sans-serif;
       display: flex;
       justify-content: center;
@@ -31,10 +31,9 @@
       color: white;
       cursor: pointer;
     }
-    video, canvas {
-      display: block;
+    video, canvas, img {
       width: 100%;
-      border-radius: 4px;
+      border-radius: 5px;
       margin-top: 10px;
     }
     .message {
@@ -76,9 +75,9 @@
       <option>मंदसौर उत्तर</option>
     </select>
 
-    <input type="text" name="Booth" placeholder="बूथ / वार्ड / पता">
+    <input type="text" name="बूथ / वार्ड / पता" placeholder="बूथ / वार्ड / पता">
 
-    <select name="आने का कारण" required>
+    <select name="purpose" required>
       <option value="">आने का कारण</option>
       <option>कार्यालय पर बैठक में</option>
       <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेंट</option>
@@ -90,9 +89,10 @@
     <!-- Hidden input for selfie -->
     <input type="hidden" name="Selfie" id="selfieInput">
 
-    <!-- Camera view -->
+    <!-- Camera view + live photo preview -->
     <video id="video" autoplay></video>
     <canvas id="canvas" style="display:none;"></canvas>
+    <img id="photoPreview" style="display:none;">
     <button type="button" onclick="capturePhoto()">📸 फोटो कैप्चर करें</button>
     <div id="photoStatus" class="message"></div>
 
@@ -106,13 +106,14 @@
     const selfieInput = document.getElementById('selfieInput');
     const photoStatus = document.getElementById('photoStatus');
     const submitStatus = document.getElementById('submitStatus');
+    const preview = document.getElementById('photoPreview');
 
-    // कैमरा चालू करें
+    // Start camera
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => { video.srcObject = stream; })
       .catch(err => { alert("कैमरा चालू नहीं हो पाया"); });
 
-    // फोटो कैप्चर करें
+    // Capture photo
     function capturePhoto() {
       const context = canvas.getContext('2d');
       canvas.width = video.videoWidth;
@@ -121,13 +122,16 @@
       const dataURL = canvas.toDataURL('image/png');
       selfieInput.value = dataURL;
       photoStatus.textContent = "✅ फोटो कैप्चर हो गई है";
+
+      preview.src = dataURL;
+      preview.style.display = "block";
     }
 
-    // फॉर्म सबमिट
+    // Submit form
     document.getElementById('visitorForm').addEventListener('submit', e => {
       e.preventDefault();
       submitStatus.textContent = "🔄 सबमिट हो रहा है...";
-      
+
       const formData = new FormData(e.target);
       fetch("https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec", {
         method: "POST",
@@ -138,6 +142,7 @@
         if (data.result === "success") {
           submitStatus.innerHTML = "🎉 आपका फॉर्म सफलतापूर्वक सबमिट हुआ<br>भाजपा कार्यालय पर आपका हार्दिक स्वागत है";
           e.target.reset();
+          preview.style.display = "none";
           photoStatus.textContent = "";
         } else {
           submitStatus.textContent = "❌ त्रुटि: " + data.error;
