@@ -7,12 +7,12 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #fff4e0;
+      background-color: #ff6f00; /* डार्क ऑरेंज */
       display: flex;
       justify-content: center;
       align-items: flex-start;
       min-height: 100vh;
-      padding-top: 30px;
+      padding: 30px 10px;
     }
 
     form {
@@ -21,13 +21,13 @@
       border-radius: 10px;
       width: 100%;
       max-width: 600px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
 
-    h2 {
+    h2, h3 {
       text-align: center;
-      color: #fff;
-      margin-bottom: 20px;
+      color: #ffffff;
+      margin: 5px 0;
     }
 
     label {
@@ -58,28 +58,30 @@
       font-size: 16px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      width: 100%;
     }
 
     button:hover {
       background-color: #ffcc80;
     }
 
-    #camera-stream, #selfiePreview {
-      width: 100%;
-      max-width: 300px;
-      border-radius: 10px;
+    #camera-container {
+      text-align: center;
       margin-top: 15px;
-      border: 2px solid white;
     }
 
-    .centered {
-      text-align: center;
+    #camera-stream, #selfiePreview {
+      width: 100%;
+      max-width: 220px;
+      border-radius: 8px;
+      margin: 10px;
+      border: 2px solid #fff;
     }
 
     .success {
       text-align: center;
       font-weight: bold;
-      margin-top: 15px;
+      margin-top: 10px;
       color: green;
     }
 
@@ -91,7 +93,8 @@
 <body>
 
   <form id="myForm" method="POST" action="https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec">
-    <h2>📋 भाजपा कार्यालय आगंतुक फॉर्म</h2>
+    <h2>भाजपा कार्यालय पर आपका स्वागत है</h2>
+    <h3>📋 आगंतुक पंजीयन</h3>
 
     <label>मोबाइल नंबर:</label>
     <input type="text" name="मोबाइल नंबर" required />
@@ -105,11 +108,14 @@
     <label>मंडल:</label>
     <select name="मंडल" required>
       <option value="">मंडल चुनें</option>
-      <option>भैसदा</option><option>भानपुरा</option><option>गरोठ</option><option>मेलखेड़ा</option>
-      <option>KHADAVADA</option><option>SHAMGARH</option><option>SUWASRA</option><option>बसई</option>
-      <option>सीतामऊ ग्रामीण</option><option>सीतामऊ</option><option>KYAMPURE</option><option>गुर्जर बर्डिया</option>
-      <option>DHUNDHDAKA</option><option>पिपलिया मंडी</option><option>बुढा</option><option>MALHARGARH</option>
-      <option>DALODA</option><option>मगरामत्ता जी</option><option>मंदसौर ग्रामीण</option><option>मंदसौर UTTAR</option><option>मंदसौर DAKSHIN</option><option>ANY JILA</option>
+      <option>भेंसोदा</option><option>भानपुरा</option><option>गरोठ</option>
+      <option>मेलखेडा</option><option>खड़ावदा</option><option>शामगढ़</option>
+      <option>सुवासरा</option><option>बसाई</option><option>सीतामऊ</option>
+      <option>क्यामपुर</option><option>सीतामऊ ग्रामीण</option><option>गुर्जर बरडिया</option>
+      <option>धुंदधड़का</option><option>बुढा</option><option>पिपलिया मंडी</option>
+      <option>मल्हारगढ़</option><option>दलोदा</option><option>मगरामाता जी</option>
+      <option>मंदसौर ग्रामीण</option><option>मंदसौर उत्तर</option>
+      <option>मंदसौर दक्षिण</option><option>अन्य जिले से आये</option>
     </select>
 
     <label>बूथ / वार्ड / पता:</label>
@@ -127,12 +133,13 @@
 
     <input type="hidden" name="Selfie" id="selfieInput" />
 
-    <div class="centered">
-      <video id="camera-stream" autoplay></video>
-      <canvas id="canvas" width="300" height="220"></canvas>
-      <button type="button" id="capture">📸 फोटो कैप्चर करें</button>
+    <div id="camera-container">
+      <video id="camera-stream" autoplay></video><br>
+      <button type="button" id="capture">📸 फोटो कैप्चर करें</button><br>
       <img id="selfiePreview" />
     </div>
+
+    <canvas id="canvas" width="300" height="220"></canvas>
 
     <div id="statusMessage" class="success"></div>
 
@@ -161,7 +168,7 @@
     const imageData = canvas.toDataURL('image/png');
     selfieInput.value = imageData;
     preview.src = imageData;
-    preview.style.display = 'block';
+    preview.style.display = 'inline';
     statusMsg.textContent = "✅ फोटो कैप्चर हो गया है।";
   });
 
@@ -173,10 +180,9 @@
     }
 
     statusMsg.textContent = "🚀 डेटा सबमिट किया जा रहा है...";
-    // ✅ फॉर्म खुद को reset नहीं करेगा
     setTimeout(() => {
       statusMsg.textContent = "🎉 आपका फॉर्म सफलतापूर्वक सबमिट हुआ!";
-    }, 2000);
+    }, 3000);
   });
 </script>
 
