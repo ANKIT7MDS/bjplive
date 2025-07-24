@@ -3,27 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orange Form</title>
+  <title>संपर्क फ़ॉर्म</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <form id="myForm">
-    <h2>फ़ॉर्म भरे</h2>
+    <h2>फ़ॉर्म भरें</h2>
     <input name="मोबाइल नंबर" type="tel" placeholder="मोबाइल नंबर" required>
     <input name="नाम" type="text" placeholder="नाम" required>
     <input name="पद" type="text" placeholder="पद" required>
-    <select name="मंडल" required><option value="">--चुनें मंडल--</option></select>
+
+    <select name="मंडल" required>
+      <option value="">--मंडल चुनें--</option>
+    </select>
+
     <input name="Booth" type="text" placeholder="बूथ / वार्ड / पता" required>
-    <select name="आने का कारण" required><option value="">--चुनें कारण--</option></select>
-    
-    <video id="camera-stream" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none;"></canvas>
+
+    <select name="आने का कारण" required>
+      <option value="">--कारण चुनें--</option>
+    </select>
+
+    <div class="camera-box">
+      <video id="camera-stream" autoplay playsinline></video>
+      <canvas id="canvas" style="display:none;"></canvas>
+      <img id="selfie-img" alt="सेल्फी" class="preview">
+    </div>
     <button type="button" id="capture">सेल्फी लें</button>
-    <img id="selfie-img" alt="Selfie preview">
-    
     <button type="submit">सबमिट करें</button>
-    <p id="message"></p>
   </form>
+
   <script src="script.js"></script>
 </body>
 </html>
