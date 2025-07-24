@@ -1,4 +1,4 @@
-const url = 'YOUR_WEBAPP_URL_HERE';
+const url = 'https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec';
 document.querySelectorAll('select[name="मंडल"]')[0].innerHTML += '<option>मंडल‑1</option><option>मंडल‑2</option>';
 document.querySelectorAll('select[name="आने का कारण"]')[0].innerHTML += '<option>कारण‑1</option><option>कारण‑2</option>';
 
