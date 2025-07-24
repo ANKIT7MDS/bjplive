@@ -2,63 +2,64 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <title>आगमन फॉर्म</title>
+  <title>आगमन पंजीकरण</title>
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #ff9800, #e65100);
-      color: #fff;
+      background: linear-gradient(to right, #ef6c00, #e65100);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
     }
 
-    .form-container {
-      background: #fff3e0;
-      color: #000;
+    .form-box {
+      background: #fff8e1;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       width: 100%;
       max-width: 480px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
 
-    .form-container h2 {
-      text-align: center;
+    .form-box h2 {
       color: #e65100;
+      text-align: center;
       margin-bottom: 20px;
     }
 
     label {
-      display: block;
-      margin: 12px 0 6px;
+      color: #bf360c;
       font-weight: bold;
-      color: #e65100;
+      margin-top: 12px;
+      display: block;
     }
 
     input, select, textarea {
       width: 100%;
       padding: 10px;
+      margin-top: 4px;
+      margin-bottom: 12px;
       border: 2px solid #ff9800;
       border-radius: 8px;
-      outline: none;
       font-size: 15px;
     }
 
     button {
       width: 100%;
       padding: 12px;
-      margin-top: 20px;
       background: #e65100;
-      border: none;
       color: #fff;
-      font-size: 16px;
+      border: none;
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s ease;
+      font-size: 16px;
     }
 
     button:hover {
@@ -66,54 +67,72 @@
     }
 
     #popup {
-      display: none;
       position: fixed;
       top: 20px;
       right: 20px;
       background: #4caf50;
       color: white;
-      padding: 12px 18px;
+      padding: 14px 20px;
       border-radius: 6px;
       font-size: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      display: none;
       z-index: 1000;
-      animation: fadeIn 0.5s;
     }
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-20px);}
-      to {opacity: 1; transform: translateY(0);}
+    video, canvas {
+      width: 100%;
+      max-height: 200px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background: #ccc;
     }
   </style>
 </head>
 <body>
 
-  <div class="form-container">
+  <div class="form-box">
     <h2>आगमन पंजीकरण</h2>
     <form id="entryForm">
-      <label for="name">नाम</label>
-      <input type="text" name="नाम" id="name" required>
+      <label>नाम</label>
+      <input type="text" name="नाम" required>
 
-      <label for="mobile">मोबाइल नंबर</label>
-      <input type="tel" name="मोबाइल नंबर" id="mobile" required>
+      <label>मोबाइल नंबर</label>
+      <input type="tel" name="मोबाइल नंबर" required>
 
-      <label for="pad">पद</label>
-      <input type="text" name="पद" id="pad">
+      <label>पद</label>
+      <input type="text" name="पद">
 
-      <label for="mandal">मंडल</label>
-      <select name="मंडल" id="mandal" required>
+      <label>मंडल</label>
+      <select name="मंडल" required>
         <option value="">-- चयन करें --</option>
-        <option value="भानपुरा">भानपुरा</option>
-        <option value="मंदसौर">मंदसौर</option>
-        <option value="सीतामऊ">सीतामऊ</option>
-        <!-- और नाम जोड़ सकते हैं -->
+        <option>भेंसोदा</option>
+        <option>भानपुरा</option>
+        <option>गरोठ</option>
+        <option>मेलखेड़ा</option>
+        <option>खड़ावदा</option>
+        <option>शामगढ़</option>
+        <option>सुवासरा</option>
+        <option>बसाई</option>
+        <option>सीतामऊ ग्रामीण</option>
+        <option>सीतामऊ</option>
+        <option>क्यांपुरे</option>
+        <option>गुर्जरबर्डिया</option>
+        <option>धुंधड़का</option>
+        <option>पिपलिया मंडी</option>
+        <option>बूढ़ा</option>
+        <option>मल्हारगढ़</option>
+        <option>दलोदा</option>
+        <option>मगरामता जी</option>
+        <option>मंदसौर ग्रामीण</option>
+        <option>मंदसौर दक्षिण</option>
+        <option>मंदसौर उत्तर</option>
       </select>
 
-      <label for="address">बूथ / वार्ड / पता</label>
-      <textarea name="बूथ / वार्ड / पता" id="address" rows="2"></textarea>
+      <label>बूथ / वार्ड / पता</label>
+      <textarea name="बूथ / वार्ड / पता" rows="2"></textarea>
 
-      <label for="reason">आने का कारण</label>
-      <select name="आने का कारण" id="reason" required>
+      <label>आने का कारण</label>
+      <select name="आने का कारण" required>
         <option value="">-- कारण चुनें --</option>
         <option>कार्यालय पर बैठक में</option>
         <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेट</option>
@@ -122,7 +141,10 @@
         <option>अन्य कोई कार्य</option>
       </select>
 
-      <!-- Hidden for selfie or other data -->
+      <label>कैमरा से सेल्फी</label>
+      <video id="video" autoplay playsinline></video>
+      <button type="button" onclick="capturePhoto()">📸 फोटो लें</button>
+      <canvas id="canvas" style="display:none;"></canvas>
       <input type="hidden" name="Selfie" id="selfieData">
 
       <button type="submit">सबमिट करें</button>
@@ -132,13 +154,43 @@
   <div id="popup">✅ सबमिट सफल!</div>
 
   <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        alert("❌ कैमरा चालू नहीं हो पाया: " + err.message);
+      }
+    }
+
+    function capturePhoto() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL("image/png");
+      document.getElementById("selfieData").value = imageData;
+      alert("✅ फोटो कैप्चर हो गई है");
+    }
+
+    function showPopup(msg, error = false) {
+      const popup = document.getElementById("popup");
+      popup.innerText = msg;
+      popup.style.background = error ? "#f44336" : "#4caf50";
+      popup.style.display = "block";
+      setTimeout(() => popup.style.display = "none", 4000);
+    }
+
     document.getElementById("entryForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
       const json = Object.fromEntries(formData.entries());
 
       try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec", {
+        const res = await fetch("YOUR_SCRIPT_URL_HERE", {
           method: "POST",
           body: new URLSearchParams(json)
         });
@@ -151,18 +203,11 @@
           showPopup("❌ त्रुटि: " + data.error, true);
         }
       } catch (err) {
-        showPopup("❌ नेटवर्क समस्या", true);
+        showPopup("❌ नेटवर्क त्रुटि", true);
       }
     });
 
-    function showPopup(msg, error = false) {
-      const popup = document.getElementById("popup");
-      popup.innerText = msg;
-      popup.style.background = error ? "#f44336" : "#4caf50";
-      popup.style.display = "block";
-      setTimeout(() => popup.style.display = "none", 4000);
-    }
+    startCamera();
   </script>
-
 </body>
 </html>
