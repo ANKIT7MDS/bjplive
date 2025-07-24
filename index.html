@@ -5,104 +5,139 @@
   <title>भाजपा कार्यालय फॉर्म</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #fff5e6;
-      padding: 20px;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff4e0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 30px;
     }
-    label {
-      font-weight: bold;
-    }
-    input, select, button {
-      display: block;
-      margin: 8px 0;
-      padding: 8px;
-      width: 300px;
-      max-width: 100%;
-    }
-    video, canvas {
+
+    form {
+      background: #ffa726;
+      padding: 25px 30px;
       border-radius: 10px;
-      border: 2px solid #888;
-      margin-top: 10px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    #selfiePreview {
-      display: none;
-      width: 150px;
-      margin-top: 10px;
-      border: 2px solid green;
-      border-radius: 8px;
+
+    h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
     }
-    .success {
-      color: green;
+
+    label {
+      color: #ffffff;
       font-weight: bold;
       margin-top: 10px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 6px;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #ffffff;
+      color: #e65100;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ffcc80;
+    }
+
+    #camera-stream, #selfiePreview {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 10px;
+      margin-top: 15px;
+      border: 2px solid white;
+    }
+
+    .centered {
+      text-align: center;
+    }
+
+    .success {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 15px;
+      color: green;
+    }
+
+    canvas {
+      display: none;
     }
   </style>
 </head>
 <body>
 
-<h2>📋 भाजपा कार्यालय आगंतुक फॉर्म</h2>
+  <form id="myForm" method="POST" action="https://script.google.com/macros/s/YOUR-SCRIPT-ID/exec">
+    <h2>📋 भाजपा कार्यालय आगंतुक फॉर्म</h2>
 
-<form id="myForm" method="POST" action="https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec">
-  <label>मोबाइल नंबर:</label>
-  <input type="text" name="मोबाइल नंबर" required />
+    <label>मोबाइल नंबर:</label>
+    <input type="text" name="मोबाइल नंबर" required />
 
-  <label>नाम:</label>
-  <input type="text" name="नाम" required />
+    <label>नाम:</label>
+    <input type="text" name="नाम" required />
 
-  <label>पद:</label>
-  <input type="text" name="पद" />
+    <label>पद:</label>
+    <input type="text" name="पद" />
 
-  <label>मंडल:</label>
-  <select name="मंडल" required>
-    <option value="">मंडल चुनें</option>
-    <option>भैसदा</option>
-    <option>भानपुरा</option>
-    <option>गरोठ</option>
-    <option>मेलखेड़ा</option>
-    <option>खखराखेड़ी</option>
-    <option>सामगढ़</option>
-    <option>सुखावड़ा</option>
-    <option>बसई</option>
-    <option>सीतामऊ ग्रामीण</option>
-    <option>सीतामऊ</option>
-    <option>कंवला</option>
-    <option>गुर्जर बर्डिया</option>
-    <option>बुंदड़का</option>
-    <option>पिपलिया मंडी</option>
-    <option>बुढा</option>
-    <option>महूगढ़</option>
-    <option>दताव</option>
-    <option>मगरामत्ता जी</option>
-    <option>मंदसौर ग्रामीण</option>
-  </select>
+    <label>मंडल:</label>
+    <select name="मंडल" required>
+      <option value="">मंडल चुनें</option>
+      <option>भैसदा</option><option>भानपुरा</option><option>गरोठ</option><option>मेलखेड़ा</option>
+      <option>खखराखेड़ी</option><option>सामगढ़</option><option>सुखावड़ा</option><option>बसई</option>
+      <option>सीतामऊ ग्रामीण</option><option>सीतामऊ</option><option>कंवला</option><option>गुर्जर बर्डिया</option>
+      <option>बुंदड़का</option><option>पिपलिया मंडी</option><option>बुढा</option><option>महूगढ़</option>
+      <option>दताव</option><option>मगरामत्ता जी</option><option>मंदसौर ग्रामीण</option>
+    </select>
 
-  <label>बूथ / वार्ड / पता:</label>
-  <input type="text" name="बूथ / वार्ड / पता" />
+    <label>बूथ / वार्ड / पता:</label>
+    <input type="text" name="बूथ / वार्ड / पता" />
 
-  <label>आने का कारण:</label>
-  <select name="purpose" required>
-    <option value="">आने का कारण चुनें</option>
-    <option>कार्यालय पर बैठक में</option>
-    <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेंट</option>
-    <option>ट्रांसफर या अन्य कोई शासकीय कार्य / शिकायत</option>
-    <option>कार्यालय पर सामान्य उपस्थिति</option>
-    <option>अन्य कोई कार्य</option>
-  </select>
+    <label>आने का कारण:</label>
+    <select name="purpose" required>
+      <option value="">आने का कारण चुनें</option>
+      <option>कार्यालय पर बैठक में</option>
+      <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेंट</option>
+      <option>ट्रांसफर या अन्य कोई शासकीय कार्य / शिकायत</option>
+      <option>कार्यालय पर सामान्य उपस्थिति</option>
+      <option>अन्य कोई कार्य</option>
+    </select>
 
-  <!-- Hidden Selfie Field -->
-  <input type="hidden" name="Selfie" id="selfieInput" />
+    <input type="hidden" name="Selfie" id="selfieInput" />
 
-  <!-- Video + Photo Capture -->
-  <video id="camera-stream" width="300" height="220" autoplay></video><br>
-  <button type="button" id="capture">📸 फोटो कैप्चर करें</button><br>
-  <img id="selfiePreview" />
-  <canvas id="canvas" width="300" height="220" style="display:none;"></canvas>
+    <div class="centered">
+      <video id="camera-stream" autoplay></video>
+      <canvas id="canvas" width="300" height="220"></canvas>
+      <button type="button" id="capture">📸 फोटो कैप्चर करें</button>
+      <img id="selfiePreview" />
+    </div>
 
-  <div id="statusMessage" class="success"></div>
+    <div id="statusMessage" class="success"></div>
 
-  <br>
-  <button type="submit">✅ सबमिट करें</button>
-</form>
+    <button type="submit">✅ सबमिट करें</button>
+  </form>
 
 <script>
   const video = document.getElementById('camera-stream');
@@ -113,15 +148,13 @@
   const statusMsg = document.getElementById('statusMessage');
   const form = document.getElementById('myForm');
 
-  // 📷 Get camera
   navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
     video.srcObject = stream;
   }).catch(err => {
-    console.error("Camera error:", err);
-    alert("कैमरा चालू नहीं हो पाया! कृपया अनुमति दें या ब्राउज़र बदलें।");
+    console.error("कैमरा एरर:", err);
+    alert("कैमरा चालू नहीं हो पाया! अनुमति दें या ब्राउज़र बदलें।");
   });
 
-  // 📸 Capture and store base64 image
   captureBtn.addEventListener('click', () => {
     const context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -129,10 +162,9 @@
     selfieInput.value = imageData;
     preview.src = imageData;
     preview.style.display = 'block';
-    statusMsg.textContent = "✅ फोटो सफलतापूर्वक कैप्चर हुआ।";
+    statusMsg.textContent = "✅ फोटो कैप्चर हो गया है।";
   });
 
-  // 📤 Confirmation message after form submit
   form.addEventListener('submit', function(e) {
     if (!selfieInput.value) {
       e.preventDefault();
@@ -140,7 +172,11 @@
       return;
     }
 
-    statusMsg.textContent = "🚀 सबमिट किया जा रहा है...";
+    statusMsg.textContent = "🚀 डेटा सबमिट किया जा रहा है...";
+    // ✅ फॉर्म खुद को reset नहीं करेगा
+    setTimeout(() => {
+      statusMsg.textContent = "🎉 आपका फॉर्म सफलतापूर्वक सबमिट हुआ!";
+    }, 2000);
   });
 </script>
 
