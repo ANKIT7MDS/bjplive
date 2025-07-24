@@ -46,48 +46,53 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
-<script>
-  $(document).ready(function() {
-    const SHEET_URL = "https://opensheet.elk.sh/1aqTbXmF4FqWdVja3K_z3EjtIlzGuPvUuyk59U9ZmSII/Sheet1";
+fetch(SHEET_URL)
+  .then(res => res.json())
+  .then(rawData => {
+    // Step 1: Mapping original Hindi keys to friendly field names
+    const data = rawData.map(row => ({
+      Timestamp: row['Timestamp'],
+      mobile: row['मोबाइल नंबर'],
+      name: row['नाम'],
+      post: row['पद'],
+      mandal: row['मंडल'],
+      address: row['बूथ / वार्ड / पता'],
+      purpose: row['आने का कारण'],
+      selfie: row['Selfie']
+    }));
 
-    fetch(SHEET_URL)
-      .then(res => res.json())
-      .then(data => {
-        const table = $('#dashboard').DataTable({
-          data: data,
-          columns: [
-            { data: 'Timestamp' },
-            { data: 'मोबाइल नंबर' },
-            { data: 'नाम' },
-            { data: 'पद' },
-            { data: 'मंडल' },
-            { data: 'बूथ / वार्ड / पता' },
-            { data: 'purpose' },
-            { data: 'Selfie',
-              render: function(data) {
-                if (data && data.startsWith('data:image')) {
-                  return `<img src="${data}" alt="Selfie" />`;
-                }
-                return '';
-              }
-            }
-          ],
-          dom: 'Bfrtip',
-          buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-          ],
-          order: [[0, 'desc']],
-          pageLength: 10
-        });
-      })
-      .catch(err => {
-        console.error("Error loading data:", err);
-        $('.container').prepend(
-          `<div class="alert alert-danger">डेटा लाने में त्रुटि: ${err.message}</div>`
-        );
-      });
+    // Step 2: DataTables init with mapped keys
+    $('#dashboard').DataTable({
+      data: data,
+      columns: [
+        { data: 'Timestamp' },
+        { data: 'mobile' },
+        { data: 'name' },
+        { data: 'post' },
+        { data: 'mandal' },
+        { data: 'address' },
+        { data: 'purpose' }, // ✅ अब कोई warning नहीं
+        {
+          data: 'selfie',
+          render: function(data) {
+            return data && data.startsWith('data:image') ?
+              `<img src="${data}" alt="Selfie" />` : '';
+          }
+        }
+      ],
+      dom: 'Bfrtip',
+      buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+      order: [[0, 'desc']],
+      pageLength: 10
+    });
+  })
+  .catch(err => {
+    console.error("Error loading data:", err);
+    $('.container').prepend(
+      `<div class="alert alert-danger">डेटा लाने में त्रुटि: ${err.message}</div>`
+    );
   });
-</script>
+
 
 </body>
 </html>
