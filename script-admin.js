@@ -1,18 +1,20 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec'; // <-- यहां अपना Apps Script Web App URL पेस्ट करें
+const API_URL = 'https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec'; // <-- यहां अपना Apps Script Web App URL डालें
 
 let table;
 
-// डेटा लाने का फ़ंक्शन
 function loadData() {
+  const naamVal = $('#fनाम').val() || '';
+  const mobileVal = $('#fमोबाइल नंबर').val() || '';
+
   const params = {
-    'नाम': $('#fनाम').val().trim(),
-    'मोबाइल नंबर': $('#fमोबाइल नंबर').val().trim()
+    'नाम': naamVal.trim(),
+    'मोबाइल नंबर': mobileVal.trim()
   };
 
-  console.log("Fetching with params:", params);
+  console.log("Fetching with:", params);
 
   $.getJSON(API_URL, params, data => {
-    console.log("Fetched Data:", data);
+    console.log("Fetched:", data);
 
     if (!data || data.length === 0) {
       alert("कोई डेटा नहीं मिला!");
@@ -21,20 +23,15 @@ function loadData() {
     }
 
     $('#admin-table').show();
-
     const headers = Object.keys(data[0]);
 
     if (!table) {
       $('#admin-table thead').html('<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>');
-
       table = $('#admin-table').DataTable({
         data: data,
         columns: headers.map(h => ({ data: h })),
-        order: [[0, 'desc']],
         pageLength: 10,
-        language: {
-          emptyTable: "कोई डेटा उपलब्ध नहीं है"
-        }
+        order: [[0, 'desc']]
       });
     } else {
       table.clear();
@@ -42,12 +39,11 @@ function loadData() {
       table.draw();
     }
   }).fail(err => {
-    console.error("Fetch Error:", err);
-    alert("❌ डेटा लाने में त्रुटि हुई!");
+    console.error("Fetch error:", err);
+    alert("डेटा लाने में त्रुटि हुई!");
   });
 }
 
-// CSV Export
 function exportCSV() {
   if (!table) return alert("कोई डेटा नहीं!");
 
@@ -62,7 +58,7 @@ function exportCSV() {
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'admin-data.csv';
+  a.download = 'export.csv';
   a.click();
 }
 
