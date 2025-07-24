@@ -92,6 +92,7 @@
   fetch(SHEET_URL)
     .then(res => res.json())
     .then(rawData => {
+      // 🧠 Sheet की हिंदी keys को English keys से map कर रहे हैं
       const data = rawData.map(row => ({
         Timestamp: row['Timestamp'],
         mobile: row['मोबाइल नंबर'],
@@ -99,7 +100,7 @@
         post: row['पद'],
         mandal: row['मंडल'],
         address: row['बूथ / वार्ड / पता'],
-        purpose: row['आने का कारण'],
+        purpose: row['आने का कारण'],  // ✅ यहाँ mapping हो गया
         selfie: row['Selfie']
       }));
 
@@ -112,7 +113,7 @@
           { data: 'post' },
           { data: 'mandal' },
           { data: 'address' },
-          { data: 'purpose' },
+          { data: 'purpose' },  // ✅ English alias, mapped from Hindi key
           {
             data: 'selfie',
             render: function (data) {
@@ -135,6 +136,7 @@
       );
     });
 </script>
+
 
 </body>
 </html>
