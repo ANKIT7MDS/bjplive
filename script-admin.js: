@@ -1,0 +1,46 @@
+const API_URL = 'https://script.google.com/macros/s/AKXYZ/exec';
+
+let table;
+
+function loadData() {
+  const params = {
+    'नाम': $('#fनाम').val().trim(),
+    'मोबाइल नंबर': $('#fमोबाइल नंबर').val().trim()
+  };
+
+  $.getJSON(API_URL, params, data => {
+    if (!table) {
+      const headers = Object.keys(data[0] || {});
+      $('#admin-table thead').html('<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>');
+      table = $('#admin-table').DataTable({
+        data: data,
+        columns: headers.map(h => ({ data: h, title: h })),
+        order: [[0,'desc']],
+        pageLength: 10
+      });
+    } else {
+      table.clear();
+      table.rows.add(data);
+      table.draw();
+    }
+  });
+}
+
+function exportCSV() {
+  const rows = table.rows({ search:'applied' }).data().toArray();
+  const csv = [table.columns().header().toArray().map(h => h.innerText).join(',')]
+    .concat(rows.map(r => Object.values(r).join(',')))
+    .join('\n');
+  const a = document.createElement('a');
+  const blob = new Blob([csv], {type:'text/csv'});
+  a.href = URL.createObjectURL(blob);
+  a.download = 'export.csv';
+  a.click();
+}
+
+$(document).ready(() => {
+  loadData();
+
+  $('#refresh').click(loadData);
+  $('#export').click(exportCSV);
+});
