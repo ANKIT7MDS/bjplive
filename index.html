@@ -1,75 +1,29 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Visitor Form + Selfie</title>
-<style>
-  body{font-family:Arial;padding:20px;background:#f5f5f5}
-  .container{max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1)}
-  input,textarea,button{width:100%;padding:10px;margin-top:10px;border:1px solid #ccc;border-radius:4px}
-  video, img{width:100%;margin-top:10px;border:1px solid #ddd}
-  button{background:#28a745;color:#fff;border:none;cursor:pointer}
-  button:hover{background:#218838}
-  #result{margin-top:20px;padding:10px;background:#e6ffe6;border:1px solid #b2fab2;border-radius:4px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orange Form</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-  <h2>Visitor Form + Selfie</h2>
-  <form id="visitorForm">
-    <input name="name" placeholder="नाम" required />
-    <input type="email" name="email" placeholder="ईमेल" required />
-    <input name="mobile" placeholder="मोबाइल नंबर" pattern="[0-9]{10}" required />
-    <textarea name="address" rows="2" placeholder="पता" required></textarea>
-    <input name="purpose" placeholder="विजिट का उद्देश्य" required />
-    <input type="date" name="date" required />
-    <video id="video" autoplay playsinline></video>
+  <form id="myForm">
+    <h2>फ़ॉर्म भरे</h2>
+    <input name="मोबाइल नंबर" type="tel" placeholder="मोबाइल नंबर" required>
+    <input name="नाम" type="text" placeholder="नाम" required>
+    <input name="पद" type="text" placeholder="पद" required>
+    <select name="मंडल" required><option value="">--चुनें मंडल--</option></select>
+    <input name="Booth" type="text" placeholder="बूथ / वार्ड / पता" required>
+    <select name="आने का कारण" required><option value="">--चुनें कारण--</option></select>
+    
+    <video id="camera-stream" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
     <button type="button" id="capture">सेल्फी लें</button>
-    <canvas id="canvas" style="display:none"></canvas>
-    <img id="photo" alt="Your selfie" />
+    <img id="selfie-img" alt="Selfie preview">
+    
     <button type="submit">सबमिट करें</button>
+    <p id="message"></p>
   </form>
-  <div id="result"></div>
-</div>
-
-<script>
-(async()=> {
-  const video = document.getElementById('video');
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-  } catch(err) {
-    alert("कैमरा ऐक्सेस में त्रुटि: " + err.message);
-  }
-
-  document.getElementById('capture').onclick = () => {
-    const canvas = document.getElementById('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    document.getElementById('photo').src = canvas.toDataURL('image/jpeg');
-  };
-
-  document.getElementById('visitorForm').onsubmit = async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const selfie = document.getElementById('photo').src;
-    fd.append('selfie', selfie);
-    const res = await fetch('<https://script.google.com/macros/s/AKfycbxicY44oDWJsyOb4HoM_t6ATH2vibdRJF2FcDCFCKtTNuxhGGObWdcT3NyOfjXhJWqq_w/exec>', {
-      method: 'POST',
-      body: fd
-    });
-    const json = await res.json();
-    if(json.result === 'success') {
-      document.getElementById('result').textContent = "डेटा गूगल शीट में सेव हो गया!";
-      e.target.reset();
-      document.getElementById('photo').src = '';
-    } else {
-      document.getElementById('result').textContent = "सर्वर error!";
-    }
-  };
-})();
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
