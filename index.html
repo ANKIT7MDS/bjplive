@@ -173,18 +173,36 @@
   });
 
   form.addEventListener('submit', function(e) {
+    e.preventDefault(); // Default submit रोकें
+
     if (!selfieInput.value) {
-      e.preventDefault();
       alert("कृपया पहले फोटो कैप्चर करें 📸");
       return;
     }
 
     statusMsg.textContent = "🚀 डेटा सबमिट किया जा रहा है...";
-    setTimeout(() => {
-      statusMsg.textContent = "🎉 आपका फॉर्म सफलतापूर्वक सबमिट हुआ!";
-    }, 3000);
+
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === "success") {
+        statusMsg.textContent = "🎉 धन्यवाद! आपका फॉर्म सफलतापूर्वक सबमिट हुआ।";
+      } else {
+        statusMsg.textContent = "❌ त्रुटि हुई! कृपया पुनः प्रयास करें।";
+      }
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      statusMsg.textContent = "❌ सबमिट नहीं हो पाया! नेटवर्क त्रुटि।";
+    });
   });
 </script>
+
 
 </body>
 </html>
