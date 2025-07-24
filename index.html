@@ -2,221 +2,151 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <title>आगमन पंजीकरण</title>
+  <title>आगंतुक फॉर्म</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #ef6c00, #e65100);
-      min-height: 100vh;
+      background: #ffecb3;
+      font-family: sans-serif;
       display: flex;
       justify-content: center;
-      align-items: center;
+      padding: 40px;
     }
-
-    .form-box {
-      background: #fff8e1;
-      padding: 30px;
-      border-radius: 12px;
+    form {
+      background: #ff9800;
+      padding: 20px;
+      border-radius: 8px;
+      color: white;
       width: 100%;
       max-width: 500px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-      position: relative;
     }
-
-    .form-box h2, .form-box h3 {
-      color: #e65100;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    label {
-      font-weight: bold;
-      margin-top: 12px;
-      display: block;
-      color: #bf360c;
-    }
-
-    input, select, textarea {
+    input, select, button {
       width: 100%;
+      margin: 10px 0;
       padding: 10px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      border: 2px solid #ff9800;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #e65100;
-      color: #fff;
+      border-radius: 4px;
       border: none;
-      font-weight: bold;
-      border-radius: 8px;
-      font-size: 16px;
+    }
+    button {
+      background: #e65100;
+      color: white;
       cursor: pointer;
     }
-
-    button:hover {
-      background: #bf360c;
-    }
-
     video, canvas {
+      display: block;
       width: 100%;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
     }
-
-    #photo-status {
-      color: green;
-      font-weight: bold;
-      font-size: 14px;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    #success-message {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #4caf50;
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
-      font-size: 18px;
+    .message {
+      margin-top: 10px;
       font-weight: bold;
       text-align: center;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-      z-index: 999;
     }
   </style>
 </head>
 <body>
-
-<div class="form-box">
-  <h2>भाजपा कार्यालय पर आपका स्वागत है</h2>
-  <h3>आगन्तुक पंजीयन</h3>
-
-  <form id="entryForm" onsubmit="return false;">
-    <label>मोबाइल नंबर</label>
-    <input type="tel" name="मोबाइल नंबर" required>
-
-    <label>नाम</label>
-    <input type="text" name="नाम" required>
-
-    <label>पद</label>
-    <input type="text" name="पद">
-
-    <label>मंडल</label>
+  <form id="visitorForm">
+    <h2>🪪 भाजपा कार्यालय पर आपका स्वागत है</h2>
+    <input type="text" name="मोबाइल नंबर" placeholder="मोबाइल नंबर" required>
+    <input type="text" name="नाम" placeholder="नाम" required>
+    <input type="text" name="पद" placeholder="पद">
+    
     <select name="मंडल" required>
-      <option value="">-- चयन करें --</option>
-      <option>भेंसोदा</option>
+      <option value="">मंडल चुनें</option>
+      <option>भैंसोदा</option>
       <option>भानपुरा</option>
       <option>गरोठ</option>
       <option>मेलखेड़ा</option>
       <option>खड़ावदा</option>
       <option>शामगढ़</option>
-      <option>सुवासरा</option>
-      <option>बसाई</option>
+      <option>सुशवाड़ा</option>
+      <option>बसई</option>
       <option>सीतामऊ ग्रामीण</option>
       <option>सीतामऊ</option>
-      <option>क्यांपुरे</option>
-      <option>गुर्जरबर्डिया</option>
-      <option>धुंधड़का</option>
+      <option>कैंपुर</option>
+      <option>गुर्जर बर्डिया</option>
+      <option>ढुंढड़का</option>
       <option>पिपलिया मंडी</option>
       <option>बूढ़ा</option>
       <option>मल्हारगढ़</option>
       <option>दलोदा</option>
-      <option>मगरामता जी</option>
+      <option>मगरमाता जी</option>
       <option>मंदसौर ग्रामीण</option>
       <option>मंदसौर दक्षिण</option>
       <option>मंदसौर उत्तर</option>
     </select>
 
-    <label>बूथ / वार्ड / पता</label>
-    <textarea name="बूथ / वार्ड / पता" rows="2"></textarea>
+    <input type="text" name="Booth" placeholder="बूथ / वार्ड / पता">
 
-    <label>purpose</label>
-    <select name="purpose" required>
-      <option value="">-- कारण चुनें --</option>
+    <select name="आने का कारण" required>
+      <option value="">आने का कारण</option>
       <option>कार्यालय पर बैठक में</option>
-      <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेट</option>
-      <option>ट्रांसफर या अन्य कोई शासकीय कार्य /शिकायत</option>
-      <option>कार्यालय पर  सामान्य उपस्थिति</option>
+      <option>माननीय जिला अध्यक्ष जी से किसी कार्य हेतु भेंट</option>
+      <option>ट्रांसफर या अन्य कोई शासकीय कार्य / शिकायत</option>
+      <option>कार्यालय पर सामान्य उपस्थिति</option>
       <option>अन्य कोई कार्य</option>
     </select>
 
-    <label>कैमरा से सेल्फी</label>
-    <video id="video" autoplay playsinline></video>
-    <button type="button" onclick="capturePhoto()">📸 फोटो लें</button>
-    <div id="photo-status"></div>
-    <canvas id="canvas" style="display:none;"></canvas>
-    <input type="hidden" name="Selfie" id="selfieData">
+    <!-- Hidden input for selfie -->
+    <input type="hidden" name="Selfie" id="selfieInput">
 
-    <button type="submit" onclick="submitForm()">सबमिट करें</button>
+    <!-- Camera view -->
+    <video id="video" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <button type="button" onclick="capturePhoto()">📸 फोटो कैप्चर करें</button>
+    <div id="photoStatus" class="message"></div>
+
+    <button type="submit">📨 सबमिट करें</button>
+    <div id="submitStatus" class="message"></div>
   </form>
 
-  <div id="success-message">✅ आपका फॉर्म सफलतापूर्वक सबमिट हुआ<br>भाजपा कार्यालय पर आपका हार्दिक स्वागत है</div>
-</div>
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const selfieInput = document.getElementById('selfieInput');
+    const photoStatus = document.getElementById('photoStatus');
+    const submitStatus = document.getElementById('submitStatus');
 
-<script>
-  const video = document.getElementById("video");
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
+    // कैमरा चालू करें
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => { alert("कैमरा चालू नहीं हो पाया"); });
 
-  async function startCamera() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-    } catch (err) {
-      alert("❌ कैमरा चालू नहीं हो पाया: " + err.message);
+    // फोटो कैप्चर करें
+    function capturePhoto() {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/png');
+      selfieInput.value = dataURL;
+      photoStatus.textContent = "✅ फोटो कैप्चर हो गई है";
     }
-  }
 
-  function capturePhoto() {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const img = canvas.toDataURL("image/png");
-    document.getElementById("selfieData").value = img;
-    document.getElementById("photo-status").innerText = "✅ फोटो कैप्चर हो गई है";
-  }
-
-  async function submitForm() {
-    const form = document.getElementById("entryForm");
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-
-    try {
-      const res = await fetch("https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec", {
+    // फॉर्म सबमिट
+    document.getElementById('visitorForm').addEventListener('submit', e => {
+      e.preventDefault();
+      submitStatus.textContent = "🔄 सबमिट हो रहा है...";
+      
+      const formData = new FormData(e.target);
+      fetch("https://script.google.com/macros/s/AKfycbxZhcfU-fSRpFCgvqhAVUiSUJNquaaZNEY-3DbPF_d3dDQisATFcGLH5_kbN-iebqB0/exec", {
         method: "POST",
-        body: new URLSearchParams(data)
+        body: new URLSearchParams(formData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === "success") {
+          submitStatus.innerHTML = "🎉 आपका फॉर्म सफलतापूर्वक सबमिट हुआ<br>भाजपा कार्यालय पर आपका हार्दिक स्वागत है";
+          e.target.reset();
+          photoStatus.textContent = "";
+        } else {
+          submitStatus.textContent = "❌ त्रुटि: " + data.error;
+        }
+      })
+      .catch(err => {
+        submitStatus.textContent = "❌ नेटवर्क त्रुटि: " + err.message;
       });
-
-      const result = await res.json();
-
-      if (result.result === "success") {
-        document.getElementById("success-message").style.display = "block";
-        form.reset();
-        document.getElementById("photo-status").innerText = "";
-        setTimeout(() => {
-          document.getElementById("success-message").style.display = "none";
-        }, 5000);
-      } else {
-        alert("❌ त्रुटि: " + result.error);
-      }
-    } catch (err) {
-      alert("❌ नेटवर्क त्रुटि: " + err.message);
-    }
-  }
-
-  startCamera();
-</script>
-
+    });
+  </script>
 </body>
 </html>
