@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Bulk PDF Export – प्रवास कार्यक्रम</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+body { margin:0; font-family:"Noto Sans Devanagari","Hind",system-ui,Arial,sans-serif; background:#f7f8fb; color:#1b2941; }
+.wrap { max-width:1200px; margin:0 auto; padding:16px; }
+.topbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; }
+.btn { border:1px solid #1f3b73; background:#eef3ff; color:#1f3b73; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600; }
+input, select, label { padding:8px 10px; border:1px solid #d6d9e0; border-radius:10px; background:#fff; }
+label.chk { display:inline-flex; align-items:center; gap:6px; border:0; padding:0; background:transparent; }
+#status { font-size:12px; color:#5c6a86; }
+#printArea { margin-top:12px; }
+.page { background:#fff; border:1px solid #e8e9ee; border-radius:16px; padding:18px; margin:12px 0; page-break-after:always; }
+.header { display:grid; grid-template-columns:80px 1fr 160px; gap:14px; align-items:center; border-bottom:4px solid #e77019; padding-bottom:10px; }
+.logo { width:80px; height:80px; border-radius:50%; background:#ffe7d6; border:2px solid #e77019; display:flex; align-items:center; justify-content:center; color:#9a3e00; font-weight:800; }
+.title h1 { margin:0; font-size:22px; color:#183566; }
+.meta { justify-self:end; color:#5c6a86; font-weight:600; }
+.content { display:grid; grid-template-columns:1.2fr 1fr; gap:14px; margin-top:10px; }
+.card { background:#fff; border:1px solid #e8e9ee; border-radius:12px; padding:12px; }
+.section-title { margin:0 0 8px; color:#183566; border-left:6px solid #e77019; padding-left:8px; font-size:16px; }
+dl { margin:0; display:grid; grid-template-columns:140px 1fr; row-gap:6px; font-size:14px; }
+dt { color:#5c6a86; } dd { margin:0; }
+.gallery { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.gallery img { width:100%; height:180px; object-fit:cover; border:1px solid #eee; border-radius:8px; }
+.groupTitle { font-size:18px; font-weight:800; margin:12px 0 4px; color:#183566; }
+@media print { .topbar { display:none; } .page { box-shadow:none; border:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      ग्रुपिंग:
+      <select id="group">
+        <option value="">None (सभी)</option>
+        <option value="mandal">मंडल‑वाइज</option>
+        <option value="month">माह‑वाइज</option>
+        <option value="type">कार्यक्रम‑वाइज</option>
+      </select>
+      मंडल: <select id="fMandal"><option value="">सभी</option></select>
+      प्रकार: <select id="fType"><option value="">सभी</option></select>
+      तारीख: <input type="date" id="fFrom"> से <input type="date" id="fTo">
+      <label class="chk"><input type="checkbox" id="fPhotoOnly"> केवल फोटो</label>
+      <input id="q" type="search" placeholder="खोजें…">
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <button class="btn" id="build">Preview Pages</button>
+      <button class="btn" id="download">Download PDF</button>
+      <span id="status">लोड हो रहा है…</span>
+    </div>
+  </div>
+
+  <div id="printArea"></div>
+</div>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4o78Xk4MGw48WSeBe5pmHyqWaJl3lPz18LcA0QCPZmpiNNmkHbJBJS_iX1s63JvhqbOFCrQEMRNeE/pub?output=csv";
+const CSV_URL_PROXY = "https://corsproxy.io/?" + encodeURIComponent(CSV_URL);
+const MAX_PHOTOS = 4;
+const H = { ts:"Timestamp", date:"कार्यक्रम दिनांक", place:"कार्यक्रम स्थान", title:"कार्यक्रम का नाम",
+  attendance:"कार्यक्रम में कुल उपस्तिथि", guests:"कार्यक्रम में प्रमुख अतिथि , जनप्रतिनिधि",
+  photos:"कार्यक्रम के फोटो", info:"कार्यक्रम से सम्बंधित अन्य जानकारी संषिप्त में", mandal:"मंडल का नाम", type:"कार्यक्रम का प्रकार" };
+
+const statusEl = document.getElementById('status'), printArea = document.getElementById('printArea');
+const groupSel = document.getElementById('group'), qEl = document.getElementById('q');
+const fMandal = document.getElementById('fMandal'), fType = document.getElementById('fType'), fFrom = document.getElementById('fFrom'), fTo = document.getElementById('fTo');
+const fPhotoOnly = document.getElementById('fPhotoOnly');
+let rows=[], filtered=[];
+
+function parseCSV(text){ const out=[]; let i=0, cell="", row=[], q=false;
+  while(i<text.length){ const ch=text[i];
+    if(q){ if(ch=='"'){ if(text[i+1]=='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else { if(ch=='"') q=true; else if(ch==','){ row.push(cell); cell=""; } else if(ch=='\n'){ row.push(cell); out.push(row); row=[]; cell=""; } else if(ch!='\r') cell+=ch; }
+    i++; }
+  if(cell.length||row.length){ row.push(cell); out.push(row); }
+  const header=out.shift().map(h => (h||"").trim());
+  return out.map(r => { const o={}; header.forEach((h,j)=>o[h]=(r[j]||"").trim()); return o; });
+}
+function toDate(val){ if(!val) return null; const d=new Date(val); if(!isNaN(d)) return d;
+  const m=val.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/); if(m){ const d2=new Date(+m[3],+m[2]-1,+m[1]); if(!isNaN(d2)) return d2; } return null; }
+function monthKey(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
+function extractID(url){ if(!url) return ""; url=url.trim().replace(/^["']|["']$/g,""); let m=url.match(/[?&]id=([\w-]+)/); if(m) return m[1]; m=url.match(/\/file\/d\/([\w-]+)/); if(m) return m[1]; if(/^[\w-]{15,}$/.test(url)) return url; return ""; }
+function candidates(url){ const id=extractID(url); if(!id) return []; return ["https://drive.google.com/uc?export=view&id="+id,"https://drive.google.com/thumbnail?id="+id+"&sz=w1200","https://lh3.googleusercontent.com/d/"+id+"=w1200"]; }
+function esc(s){ return (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function hasPhotos(r){ return (r[H.photos]||"").split(/[\n,]/).map(s=>s.trim()).filter(Boolean).length>0; }
+function uniq(a){ return [...new Set(a.filter(Boolean))]; }
+
+function applyFilters(){
+  let list = rows.slice();
+  const q = qEl.value.trim().toLowerCase();
+  if (q) list = list.filter(r => [r[H.title],r[H.place],r[H.mandal],r[H.type],r[H.guests],r[H.info]].join(" ").toLowerCase().includes(q));
+  const m=fMandal.value; if(m) list=list.filter(r=>r[H.mandal]===m);
+  const t=fType.value; if(t) list=list.filter(r=>r[H.type]===t);
+  const df=fFrom.value?new Date(fFrom.value):null; const dt=fTo.value?new Date(fTo.value):null;
+  if (df||dt) list=list.filter(r=>{ const d=toDate(r[H.date]); if(!d) return false; if(df&&d<df) return false; if(dt&&d>dt) return false; return true; });
+  if (fPhotoOnly.checked) list = list.filter(hasPhotos);
+  filtered = list;
+  statusEl.textContent = "रिकॉर्ड: " + filtered.length;
+}
+
+function groupBuckets(list, key){
+  const map={};
+  list.forEach(r=>{
+    let g="All";
+    if(key==="mandal") g=r[H.mandal]||"—";
+    else if(key==="type") g=r[H.type]||"—";
+    else if(key==="month"){ const d=toDate(r[H.date]); g=d?monthKey(d):"—"; }
+    map[g]=map[g]||[]; map[g].push(r);
+  });
+  return map; // {group: [rows]}
+}
+
+function buildPageHTML(r, i, total){
+  const guests=(r[H.guests]||"").split(",").map(s=>s.trim()).filter(Boolean);
+  const photos=(r[H.photos]||"").split(/[\n,]/).map(s=>s.trim()).filter(Boolean).slice(0,MAX_PHOTOS);
+  const gal = photos.map(u=>{
+    const tries=candidates(u); const src=(tries[0]||u);
+    return `<img crossorigin="anonymous" src="${src}" onerror="this.onerror=null;this.src='${tries[1]||src}'">`;
+  }).join("");
+  return `
+  <div class="page">
+    <div class="header">
+      <div class="logo">BJ</div>
+      <div class="title">
+        <h1>${esc(r[H.title]||"")}</h1>
+        <div>${esc(r[H.place]||"")} • ${esc(r[H.date]||"")}</div>
+      </div>
+      <div class="meta">${i} / ${total}</div>
+    </div>
+    <div class="content">
+      <div class="card">
+        <h3 class="section-title">कार्यक्रम विवरण</h3>
+        <dl>
+          <dt>मंडल</dt><dd>${esc(r[H.mandal]||"")}</dd>
+          <dt>प्रकार</dt><dd>${esc(r[H.type]||"")}</dd>
+          <dt>उपस्थिति</dt><dd>${esc(r[H.attendance]||"")}</dd>
+          <dt>अतिथि</dt><dd>${guests.join(", ")||"—"}</dd>
+        </dl>
+        <div style="margin-top:8px">${esc(r[H.info]||"").replace(/\n/g,"<br>")}</div>
+      </div>
+      <div class="card">
+        <h3 class="section-title">फोटो</h3>
+        <div class="gallery">${gal}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// --- Ensure all images are loaded before converting to PDF (to avoid missing photos) ---
+async function waitForImages(root){
+  const imgs = Array.from(root.querySelectorAll('img'));
+  const perImageTimeout = 15000; // 15s per image
+  await Promise.all(imgs.map(img => new Promise(resolve => {
+    if (img.complete && img.naturalWidth > 0) return resolve();
+    const done = () => resolve();
+    img.addEventListener('load', done, {once:true});
+    img.addEventListener('error', done, {once:true});
+    setTimeout(done, perImageTimeout);
+  })));
+}
+
+function buildPreview(){
+  applyFilters();
+  printArea.innerHTML = "";
+  if(!filtered.length){ printArea.innerHTML="<div class='page'><b>कोई रिकॉर्ड नहीं मिला।</b></div>"; return; }
+
+  const mode = groupSel.value; // "", "mandal", "month", "type"
+  if(!mode){
+    // All pages
+    filtered.forEach((r,idx)=>{ printArea.insertAdjacentHTML("beforeend", buildPageHTML(r, idx+1, filtered.length)); });
+    return;
+  }
+  // Grouped pages
+  const buckets = groupBuckets(filtered, mode);
+  const keys = Object.keys(buckets).sort();
+  keys.forEach(g=>{
+    const arr=buckets[g];
+    // Group header (not page-breaking)
+    const head = `<div class="groupTitle">${ mode==="mandal"?"मंडल":"month"===mode?"माह":"कार्यक्रम प्रकार" } : ${esc(g)}</div>`;
+    printArea.insertAdjacentHTML("beforeend", head);
+    arr.forEach((r,idx)=>{ printArea.insertAdjacentHTML("beforeend", buildPageHTML(r, idx+1, arr.length)); });
+  });
+}
+
+async function downloadPDF(){
+  if(!printArea.children.length){ alert("पहले Preview Pages क्लिक करें."); return; }
+  const opt = {
+    margin:       [10, 8, 10, 8],
+    filename:     'Pravas_Programs.pdf',
+    image:        { type: 'jpeg', quality: 0.95 },
+    html2canvas:  { scale: 2, useCORS: true, allowTaint: true, imageTimeout: 15000 },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  await waitForImages(printArea);
+  html2pdf().set(opt).from(printArea).save();
+}
+
+function populateFilters(){
+  const mandals = uniq(rows.map(r=>r[H.mandal]));
+  const types   = uniq(rows.map(r=>r[H.type]));
+  fMandal.innerHTML = '<option value="">सभी</option>' + mandals.map(m=>`<option>${m}</option>`).join("");
+  fType.innerHTML   = '<option value="">सभी</option>' + types.map(t=>`<option>${t}</option>`).join("");
+}
+function fromQuery(){
+  const p = new URLSearchParams(location.search);
+  if (p.get("mandal")) fMandal.value = p.get("mandal");
+  if (p.get("type"))   fType.value   = p.get("type");
+  if (p.get("from"))   fFrom.value   = p.get("from");
+  if (p.get("to"))     fTo.value     = p.get("to");
+  if (p.get("photo")==="1") fPhotoOnly.checked = true;
+}
+
+async function init(){
+  try{ rows = await fetch(CSV_URL,{cache:"no-store"}).then(r=>r.text()).then(parseCSV);
+  }catch(e){ rows = await fetch(CSV_URL_PROXY,{cache:"no-store"}).then(r=>r.text()).then(parseCSV); }
+  statusEl.textContent = "रिकॉर्ड: "+rows.length;
+  populateFilters(); fromQuery(); applyFilters(); buildPreview();
+}
+
+document.getElementById('build').onclick = buildPreview;
+document.getElementById('download').onclick = downloadPDF;
+[qEl,fMandal,fType,fFrom,fTo,fPhotoOnly,groupSel].forEach(el=>el.addEventListener('change',()=>{ applyFilters(); }));
+
+init();
+</script>
+</body>
+</html>

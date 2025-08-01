@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>प्रवास कार्यक्रम – Theme A (ENHANCED v2.2)</title>
+<style>
+body { margin:0; font-family:"Noto Sans Devanagari","Hind",system-ui,Arial,sans-serif; background:#f7f8fb; color:#1b2941; }
+.wrap { max-width:1200px; margin:0 auto; padding:16px; }
+.topbar, .filters, .extras { display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; }
+.btn { border:1px solid #1f3b73; background:#eef3ff; color:#1f3b73; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600; }
+.btn:disabled { opacity:.5; cursor:default; }
+input, select, label { padding:8px 10px; border:1px solid #d6d9e0; border-radius:10px; background:#fff; }
+label.chk { display:inline-flex; align-items:center; gap:6px; border:0; padding:0; background:transparent; }
+.page { background:#fff; border:1px solid #e8e9ee; border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,.05); padding:18px; margin-top:10px; }
+.header { display:grid; grid-template-columns:80px 1fr 120px; gap:14px; align-items:center; border-bottom:4px solid #e77019; padding-bottom:10px; }
+.logo { width:80px; height:80px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff, #ffe7d6); border:2px solid #e77019; display:flex; align-items:center; justify-content:center; color:#9a3e00; font-weight:800; }
+.title h1 { margin:0; color:#183566; font-size:28px; }
+.subtitle { color:#5c6a86; }
+.meta { justify-self:end; color:#5c6a86; font-weight:600; }
+.content { display:grid; grid-template-columns:1.2fr 1fr; gap:18px; margin-top:14px; }
+.card { background:#fff; border:1px solid #e8e9ee; border-radius:14px; padding:14px; }
+.section-title { margin:0 0 8px; color:#183566; border-left:6px solid #e77019; padding-left:8px; }
+dl { margin:0; display:grid; grid-template-columns:160px 1fr; row-gap:8px; }
+dt { color:#5c6a86; } dd { margin:0; }
+ul.bullets { margin:0; padding-left:18px; }
+.gallery { display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+.thumb { position:relative; border-radius:12px; overflow:hidden; border:1px solid #e8e9ee; background:#fafafa; }
+.thumb img { width:100%; height:180px; object-fit:cover; display:block; }
+.open-original { position:absolute; left:8px; bottom:8px; background:rgba(31,59,115,.95); color:#fff; font-size:11px; padding:3px 8px; border-radius:999px; text-decoration:none; }
+.watch { position:absolute; right:8px; bottom:8px; background:rgba(231,112,25,.95); color:#fff; font-size:12px; padding:3px 8px; border-radius:999px; cursor:pointer; }
+.lightbox { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.75); z-index:999; }
+.lightbox.open { display:flex; }
+.lightbox img { max-width:92vw; max-height:90vh; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.35); }
+.lbnav { position:absolute; top:50%; transform:translateY(-50%); font-size:30px; color:#fff; background:rgba(0,0,0,.4); padding:8px 12px; border-radius:10px; cursor:pointer; }
+.lbprev { left:14px; } .lbnext { right:14px; }
+.status { font-size:12px; color:#5c6a86; }
+@media print { .topbar, .filters, .extras { display:none; } .page { page-break-after:always; box-shadow:none; border:none; } }
+/* Mobile photo size fix */
+@media (max-width: 640px) {
+  .content { grid-template-columns: 1fr; }
+  .gallery { grid-template-columns: repeat(2, 1fr) !important; }
+  .thumb img { height: 180px !important; }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  .thumb img { height: clamp(220px, 28vw, 320px) !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <button class="btn" id="prev">◀︎ पिछला</button>
+      <button class="btn" id="next">अगला ▶︎</button>
+      <select id="jump"></select>
+    </div>
+    <div>
+      <input id="search" type="search" placeholder="खोजें (नाम/स्थान/अतिथि)" />
+      <button class="btn" onclick="window.print()">PDF (Current Page)</button>
+      <button class="btn" id="bulkPdfBtn">Bulk PDF</button> <!-- NEW -->
+      <span class="status" id="status">लोड हो रहा है…</span>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div>
+      मंडल: <select id="fMandal"><option value="">सभी</option></select>
+      &nbsp; प्रकार: <select id="fType"><option value="">सभी</option></select>
+      &nbsp; <label class="chk"><input type="checkbox" id="fPhotoOnly"> केवल फोटो वाले</label>
+    </div>
+    <div>
+      तारीख: <input type="date" id="fFrom"> से <input type="date" id="fTo">
+      &nbsp; उपस्थिति: Min <input type="number" id="fAttMin" style="width:90px"> Max <input type="number" id="fAttMax" style="width:90px">
+      &nbsp; <select id="sort">
+        <option value="">क्रमबद्ध करें</option>
+        <option value="date">तारीख</option>
+        <option value="att">उपस्थिति</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="extras">
+    <div>
+      <label class="chk"><input type="checkbox" id="autoPlay"> Auto‑advance</label>
+      अंतराल (sec): <input type="number" id="autoInterval" value="12" min="5" max="60" style="width:80px">
+      <label class="chk"><input type="checkbox" id="autoRefresh"> Auto‑refresh</label>
+      हर (min): <input type="number" id="refreshMin" value="5" min="1" max="60" style="width:70px">
+    </div>
+    <div></div>
+  </div>
+
+  <div id="page" class="page"></div>
+</div>
+
+<div id="lightbox" class="lightbox">
+  <div class="lbnav lbprev" id="lbPrev">❮</div>
+  <img id="lbImg" src="" alt=""/>
+  <div class="lbnav lbnext" id="lbNext">❯</div>
+</div>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4o78Xk4MGw48WSeBe5pmHyqWaJl3lPz18LcA0QCPZmpiNNmkHbJBJS_iX1s63JvhqbOFCrQEMRNeE/pub?output=csv";
+const CSV_URL_PROXY = "https://corsproxy.io/?" + encodeURIComponent(CSV_URL);
+const MAX_PHOTOS = 4;
+const H = { ts:"Timestamp", date:"कार्यक्रम दिनांक", place:"कार्यक्रम स्थान", title:"कार्यक्रम का नाम",
+  attendance:"कार्यक्रम में कुल उपस्तिथि", guests:"कार्यक्रम में प्रमुख अतिथि , जनप्रतिनिधि",
+  photos:"कार्यक्रम के फोटो", info:"कार्यक्रम से सम्बंधित अन्य जानकारी संषिप्त में", mandal:"मंडल का नाम", type:"कार्यक्रम का प्रकार" };
+
+const statusEl = document.getElementById('status'), pageEl = document.getElementById('page');
+const prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next'), jumpSel = document.getElementById('jump');
+const fMandal = document.getElementById('fMandal'), fType = document.getElementById('fType'), fFrom = document.getElementById('fFrom'), fTo = document.getElementById('fTo');
+const sortSel = document.getElementById('sort'), searchEl = document.getElementById('search');
+const fPhotoOnly = document.getElementById('fPhotoOnly'), fAttMin = document.getElementById('fAttMin'), fAttMax = document.getElementById('fAttMax');
+const autoPlayEl = document.getElementById('autoPlay'), autoIntervalEl = document.getElementById('autoInterval'), autoRefreshEl = document.getElementById('autoRefresh'), refreshMinEl = document.getElementById('refreshMin');
+const bulkBtn = document.getElementById('bulkPdfBtn'); // NEW
+
+let rows = [], filtered = [], idx = 0, autoPlayTimer=null, autoRefreshTimer=null;
+
+function parseCSV(text){ const out=[]; let i=0, cell="", row=[], q=false;
+  while(i<text.length){ const ch=text[i];
+    if(q){ if(ch=='"'){ if(text[i+1]=='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else { if(ch=='"') q=true; else if(ch==','){ row.push(cell); cell=""; } else if(ch=='\n'){ row.push(cell); out.push(row); row=[]; cell=""; } else if(ch!='\r') cell+=ch; }
+    i++; }
+  if(cell.length||row.length){ row.push(cell); out.push(row); }
+  const header=out.shift().map(h => (h||"").trim());
+  return out.map(r => { const o={}; header.forEach((h,j)=>o[h]=(r[j]||"").trim()); return o; });
+}
+function unique(vals){ return [...new Set(vals.filter(Boolean))]; }
+function toDate(val){ if (!val) return null; const d = new Date(val); if (!isNaN(d)) return d; const m = val.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/); if (m){ const day=+m[1], mon=+m[2]-1, yr=+m[3]; const d2 = new Date(yr,mon,day); if(!isNaN(d2)) return d2; } return null; }
+function extractID(url){ if(!url) return ""; url=url.trim().replace(/^["']|["']$/g,""); let m=url.match(/[?&]id=([A-Za-z0-9_\-]+)/); if(m) return m[1]; m=url.match(/\/file\/d\/([A-Za-z0-9_\-]+)/); if(m) return m[1]; if(/^[A-Za-z0-9_-]{15,}$/.test(url)) return url; return ""; }
+function candidates(url){ const id=extractID(url); if(!id) return []; return ["https://drive.google.com/uc?export=view&id="+id,"https://drive.google.com/thumbnail?id="+id+"&sz=w1200","https://lh3.googleusercontent.com/d/"+id+"=w1200"]; }
+function esc(s){ return (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+function renderOne(r){
+  const guests=(r[H.guests]||"").split(",").map(s=>s.trim()).filter(Boolean);
+  const photos=(r[H.photos]||"").split(/[\n,]/).map(s=>s.trim()).filter(Boolean).slice(0,MAX_PHOTOS);
+  pageEl.innerHTML = `
+    <div class="header">
+      <div class="logo">BJ</div>
+      <div class="title">
+        <h1>माननीय जिला अध्यक्ष जी का प्रवास कार्यक्रम</h1>
+        <div class="subtitle">${esc(r[H.title]||"")}${r[H.place]?" • "+esc(r[H.place]):""}</div>
+      </div>
+      <div class="meta">${idx+1} / ${filtered.length}</div>
+    </div>
+    <div class="content">
+      <div class="card">
+        <h3 class="section-title">कार्यक्रम विवरण</h3>
+        <dl>
+          <dt>तारीख</dt><dd>${esc(r[H.date]||"")}</dd>
+          <dt>स्थान</dt><dd>${esc(r[H.place]||"")}</dd>
+          <dt>मंडल</dt><dd>${esc(r[H.mandal]||"")}</dd>
+          <dt>प्रकार</dt><dd>${esc(r[H.type]||"")}</dd>
+          <dt>उपस्थिति</dt><dd>${esc(r[H.attendance]||"")}</dd>
+          <dt>अतिथि</dt><dd>${guests.length ? "<ul class='bullets'>"+guests.map(g=>"<li>"+esc(g)+"</li>").join("")+"</ul>":"—"}</dd>
+        </dl>
+        <div style="margin-top:8px; line-height:1.55;">${esc(r[H.info]||"").replace(/\n/g,"<br>")}</div>
+      </div>
+      <div class="card">
+        <h3 class="section-title">फोटो गैलरी</h3>
+        <div class="gallery" id="gal"></div>
+      </div>
+    </div>`;
+  const gal=document.getElementById("gal");
+  photos.forEach((u,i)=>{
+    const div=document.createElement("div"); div.className="thumb";
+    const tries=candidates(u); const img=document.createElement("img"); let k=0; img.src=tries[k]||u; img.onerror=()=>{ if(++k<tries.length) img.src=tries[k]; };
+    const a=document.createElement("a"); a.className="open-original"; a.href=(tries[0]||u); a.target="_blank"; a.textContent="Open original";
+    const w=document.createElement("div"); w.className="watch"; w.textContent="देखें"; w.onclick=()=>openLB(tries[0]||u, i, (r[H.photos]||"").split(/[\n,]/).map(s=>s.trim()).filter(Boolean).slice(0,MAX_PHOTOS));
+    div.append(img,a,w); gal.appendChild(div);
+  });
+}
+let lbIdx=0, lbList=[]; const lb=document.getElementById('lightbox'), lbImg=document.getElementById('lbImg');
+document.getElementById('lbPrev').onclick=()=>{ if(!lbList.length) return; lbIdx=(lbIdx-1+lbList.length)%lbList.length; lbImg.src=lbList[lbIdx]; };
+document.getElementById('lbNext').onclick=()=>{ if(!lbList.length) return; lbIdx=(lbIdx+1)%lbList.length; lbImg.src=lbList[lbIdx]; };
+lb.addEventListener('click',(e)=>{ if(e.target===lb) lb.classList.remove('open'); });
+function openLB(src,i,list){ lbList=list.map(u=> (candidates(u)[0]||u)); lbIdx=i; lbImg.src=lbList[lbIdx]; lb.classList.add('open'); }
+
+function uniqueListKey(r){ return [r[H.title]||"", r[H.place]||"", r[H.date]||""].join(" "); } // for search
+
+function populateFilters(data){
+  const mandals = [...new Set(data.map(r=>r[H.mandal]).filter(Boolean))];
+  const types   = [...new Set(data.map(r=>r[H.type]).filter(Boolean))];
+  fMandal.innerHTML = '<option value="">सभी</option>' + mandals.map(m=>`<option>${m}</option>`).join("");
+  fType.innerHTML   = '<option value="">सभी</option>' + types.map(t=>`<option>${t}</option>`).join("");
+}
+function hasPhotos(r){ return (r[H.photos]||"").split(/[\n,]/).map(s=>s.trim()).filter(Boolean).length>0; }
+function applyFilters(){
+  let list = rows.slice();
+  const q = searchEl.value.trim().toLowerCase();
+  if (q) list = list.filter(r => (uniqueListKey(r)+" "+(r[H.mandal]||"")+" "+(r[H.type]||"")+" "+(r[H.guests]||"")+" "+(r[H.info]||"")).toLowerCase().includes(q));
+  const m=fMandal.value; const mlist = (window.deepLinkMandal||null); if(mlist&&mlist.length){ list=list.filter(r=> mlist.includes(r[H.mandal])); } else if(m){ list=list.filter(r=>r[H.mandal]===m); }
+  const t=fType.value;   const tlist = (window.deepLinkType||null); if(tlist&&tlist.length){ list=list.filter(r=> tlist.includes(r[H.type])); } else if(t){ list=list.filter(r=>r[H.type]===t); }
+  const df=fFrom.value?new Date(fFrom.value):null; const dt=fTo.value?new Date(fTo.value):null;
+  if (df||dt) list=list.filter(r=>{ const d=toDate(r[H.date]); if(!d) return false; if(df&&d<df) return false; if(dt&&d>dt) return false; return true; });
+  const amin = parseInt(fAttMin.value||"",10); const amax = parseInt(fAttMax.value||"",10);
+  if(!isNaN(amin)) list = list.filter(r => (parseInt(r[H.attendance]||"0",10) || 0) >= amin);
+  if(!isNaN(amax)) list = list.filter(r => (parseInt(r[H.attendance]||"0",10) || 0) <= amax);
+  if(fPhotoOnly.checked) list = list.filter(hasPhotos);
+  const s=sortSel.value;
+  if (s==="att") list.sort((a,b)=> (parseInt(b[H.attendance]||0) - parseInt(a[H.attendance]||0)));
+  if (s==="date") list.sort((a,b)=> { const da=toDate(a[H.date])||0, db=toDate(b[H.date])||0; return db-da; });
+  filtered=list; idx=0; renderCurrent(); populateJump();
+}
+function populateJump(){ jumpSel.innerHTML=""; filtered.forEach((r,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=(i+1)+": "+(r[H.title]||"")+(r[H.place]?" • "+r[H.place]:""); jumpSel.appendChild(o); }); }
+function renderCurrent(){
+  if (!filtered.length){
+    pageEl.innerHTML = `<div class="header"><div class="logo">BJ</div><div class="title"><h1>माननीय जिला अध्यक्ष जी का प्रवास कार्यक्रम</h1></div><div class="meta">0 / 0</div></div><div class="content"><div class="card">कोई रिकॉर्ड नहीं मिला। ऊपर सर्च/फ़िल्टर बदलकर देखें।</div></div>`;
+    prevBtn.disabled=nextBtn.disabled=true; statusEl.textContent="रिकॉर्ड: 0"; return;
+  }
+  renderOne(filtered[idx]); prevBtn.disabled=(idx===0); nextBtn.disabled=(idx>=filtered.length-1);
+  statusEl.textContent="रिकॉर्ड: "+filtered.length; jumpSel.value=String(idx);
+}
+async function loadCSV(url){ const res=await fetch(url,{cache:"no-store"}); if(!res.ok) throw new Error("CSV fetch failed "+res.status); const text=await res.text(); return parseCSV(text); }
+async function init(){
+  statusEl.textContent="CSV लोड हो रहा है…";
+  try{ rows=await loadCSV(CSV_URL); } catch(e){ try{ rows=await loadCSV(CSV_URL_PROXY); } catch(e2){ statusEl.textContent="लोड त्रुटि: CSV उपलब्ध नहीं"; return; } }
+  if(!rows.length){ statusEl.textContent="रिकॉर्ड: 0 (CSV खाली?)"; return; }
+  populateFilters(rows); filtered=rows.slice(); renderCurrent(); populateJump();
+  restartAutoRefresh();
+  // If autoplay was enabled via URL, start it now
+  if (autoPlayEl.checked) { try { restartAutoPlay(); } catch(e){} }
+}
+prevBtn.onclick=()=>{ if(idx>0){ idx--; renderCurrent(); } };
+nextBtn.onclick=()=>{ if(idx<filtered.length-1){ idx++; renderCurrent(); } };
+jumpSel.onchange=(e)=>{ idx=parseInt(e.target.value||"0",10)||0; renderCurrent(); };
+searchEl.oninput=applyFilters; [fMandal,fType,fFrom,fTo,sortSel,fPhotoOnly,fAttMin,fAttMax].forEach(el=>el.addEventListener('change',applyFilters));
+
+function restartAutoPlay(){
+  if(autoPlayTimer){ clearInterval(autoPlayTimer); autoPlayTimer=null; }
+  if(autoPlayEl.checked){
+    const sec = Math.max(5, Math.min(60, parseInt(autoIntervalEl.value||"12",10)||12));
+    autoPlayTimer = setInterval(()=>{
+      if(filtered.length){ if(idx<filtered.length-1){ idx++; } else { idx=0; } renderCurrent(); }
+    }, sec*1000);
+  }
+}
+autoPlayEl.addEventListener('change', restartAutoPlay);
+autoIntervalEl.addEventListener('change', restartAutoPlay);
+
+async function doRefresh(){
+  try{
+    const newRows = await loadCSV(CSV_URL).catch(()=>loadCSV(CSV_URL_PROXY));
+    if(newRows && newRows.length){
+      rows = newRows;
+      applyFilters();
+    }
+  }catch(e){}
+}
+function restartAutoRefresh(){
+  if(autoRefreshTimer){ clearInterval(autoRefreshTimer); autoRefreshTimer=null; }
+  if(autoRefreshEl.checked){
+    const m = Math.max(1, Math.min(60, parseInt(refreshMinEl.value||"5",10)||5));
+    autoRefreshTimer = setInterval(doRefresh, m*60*1000);
+  }
+}
+autoRefreshEl.addEventListener('change', restartAutoRefresh);
+refreshMinEl.addEventListener('change', restartAutoRefresh);
+
+// NEW: Bulk PDF – current filters के साथ नया पेज खुले
+bulkBtn.onclick = () => {
+  const params = new URLSearchParams();
+  if (fMandal.value) params.set("mandal", fMandal.value);
+  if (fType.value) params.set("type", fType.value);
+  if (fFrom.value) params.set("from", fFrom.value);
+  if (fTo.value)   params.set("to",   fTo.value);
+  if (fPhotoOnly.checked) params.set("photo", "1");
+  if (sortSel.value) params.set("sort", sortSel.value);
+  const url = "karyakram_bulk_pdf_export.html?" + params.toString();
+  window.open(url, "_blank");
+};
+
+
+// --- Deep‑link URL params: mandal=Wardha|Nagpur&type=...&from=YYYY-MM-DD&to=YYYY-MM-DD&photos=1&attmin=25&attmax=500&autoplay=1&interval=12&refresh=5 ---
+(function(){
+  try{
+    const p = new URLSearchParams(location.search);
+    const m = p.get('mandal'); if (m){ if(m.includes('|')){ window.deepLinkMandal = m.split('|').map(s=>s.trim()).filter(Boolean); } else { fMandal.value = m; } }
+    const t = p.get('type');   if (t){ if(t.includes('|')){ window.deepLinkType = t.split('|').map(s=>s.trim()).filter(Boolean); } else { fType.value = t; } }
+    const from = p.get('from'); if (from) fFrom.value = from;
+    const to   = p.get('to');   if (to)   fTo.value = to;
+    if (p.get('photos')==='1' || p.get('photo')==='1') fPhotoOnly.checked = true;
+    const amin = p.get('attmin'); if (amin) fAttMin.value = amin;
+    const amax = p.get('attmax'); if (amax) fAttMax.value = amax;
+    if (p.get('autoplay')==='1') autoPlayEl.checked = true;
+    const sec = parseInt(p.get('interval')||'',10); if(!isNaN(sec)) autoIntervalEl.value = sec;
+    const ref = parseInt(p.get('refresh')||'',10); if(!isNaN(ref) && ref>0){ autoRefreshEl.checked = true; refreshMinEl.value = ref; }
+  }catch(e){ /* ignore */ }
+})();
+
+init();
+</script>
+</body>
+</html>

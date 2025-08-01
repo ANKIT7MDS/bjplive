@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>प्रवास कार्यक्रम – TV Mode</title>
+<style>
+:root{ --bg:#0b1220; --panel:#0f1a33; --card:#0e1426; --brand:#e77019; --ink:#fff; --muted:#9ab; }
+*{ box-sizing:border-box; } html,body{ height:100%; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:"Noto Sans Devanagari","Hind",system-ui,Arial,sans-serif; }
+.container { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; }
+.slide { width:92vw; height:92vh; background:var(--panel); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.4); padding:18px; display:grid; grid-template-columns:1.1fr 1fr; gap:18px; }
+.header { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; border-bottom:4px solid var(--brand); padding-bottom:8px; }
+.h1 { font-size:30px; font-weight:800; } .meta { opacity:.8; }
+.card { background:var(--card); border:1px solid #223; border-radius:14px; padding:12px; }
+.section { font-size:18px; color:#a9c1ff; margin-bottom:6px; }
+dl { margin:0; display:grid; grid-template-columns:150px 1fr; row-gap:6px; }
+dt { color:var(--muted); } dd { margin:0; color:#fff; }
+.gallery { display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; }
+.gallery img { width:100%; height:34vh; object-fit:cover; border-radius:10px; background:#000; }
+.controls { position:fixed; top:10px; right:10px; display:flex; gap:8px; transition:opacity .4s ease; }
+.btn { background:var(--brand); color:#fff; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; font-weight:700; }
+.hint { position:fixed; bottom:10px; right:10px; color:#ccc; font-size:12px; }
+.controls.hidden{ opacity:0; pointer-events:none; }
+.rotate-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.85); color:#fff; display:none; align-items:center; justify-content:center; text-align:center; padding:20px; z-index:9999; }
+.rotate-overlay .box{ max-width:520px; } .rotate-overlay .box h2{ margin:0 0 8px; font-size:24px; }
+.rotate-overlay .box p{ margin:0 0 12px; color:#c9d6ff; } .rotate-overlay .box .btn{ background:#1f3b73; }
+@media (orientation:portrait){
+  .slide{ width:96vw; height:96vh; grid-template-columns:1fr; }
+  .gallery{ grid-template-columns:1fr; } .gallery img{ height: min(35vh, 360px); }
+  dl{ grid-template-columns:130px 1fr; }
+}
+@media (max-width: 900px) and (orientation:landscape){ .gallery img{ height: clamp(220px, 38vh, 420px); } }
+label.small { font-size:12px; color:#eee; display:inline-flex; align-items:center; gap:6px; }
+input[type="number"]{ width:70px; border-radius:8px; border:1px solid #345; background:#18203a; color:#fff; padding:6px 8px; }
+</style>
+</head>
+<body>
+<div class="controls" id="controls">
+  <button class="btn" id="start">Start TV</button>
+  <button class="btn" id="pause">Pause</button>
+  <button class="btn" id="prev">◀</button>
+  <button class="btn" id="next">▶</button>
+  <label class="small"><input type="checkbox" id="photosOnly"> Photos only</label> <!-- NEW -->
+  <label class="small">Interval(s) <input type="number" id="sec" value="12" min="5" max="60"></label>
+  <label class="small"><input type="checkbox" id="autoRefresh"> Auto‑refresh</label>
+  <label class="small">Every (min) <input type="number" id="min" value="5" min="1" max="60"></label>
+  <button class="btn" id="hide">Hide UI</button>
+</div>
+<div class="container"><div class="slide" id="slide"></div></div>
+<div class="hint">Keys: F = Fullscreen, Space = Pause/Play, ←/→ = Prev/Next, N = Photos‑only</div>
+
+<div class="rotate-overlay" id="rot">
+  <div class="box">
+    <h2>कृपया मोबाइल को लैंडस्‍केप में घुमाएँ</h2>
+    <p>टीवी मोड चौड़ी स्क्रीन पर बेहतर दिखता है। आप चाहें तो पोर्ट्रेट में भी जारी रख सकते हैं।</p>
+    <div style="display:flex; gap:8px; justify-content:center;">
+      <button class="btn" id="continuePortrait">Continue anyway</button>
+      <button class="btn" id="goFullscreen">Go Fullscreen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4o78Xk4MGw48WSeBe5pmHyqWaJl3lPz18LcA0QCPZmpiNNmkHbJBJS_iX1s63JvhqbOFCrQEMRNeE/pub?output=csv";
+const CSV_URL_PROXY = "https://corsproxy.io/?" + encodeURIComponent(CSV_URL);
+const MAX_PHOTOS = 4;
+let rows=[], allRows=[], idx=0, timer=null, playing=false;
+let autoHideTimer=null, photosOnly=false, interval=12000, refreshTimer=null;
+
+function parseCSV(text){
+  const out=[]; let i=0,c="",row=[],q=false;
+  while(i<text.length){
+    const ch=text[i];
+    if(q){ if(ch=='"'){ if(text[i+1]=='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch=='"') q=true; else if(ch==','){ row.push(c); c=""; } else if(ch=='\n'){ row.push(c); out.push(row); row=[]; c=""; } else if(ch!='\r') c+=ch; }
+    i++;
+  }
+  if(c.length||row.length){ row.push(c); out.push(row); }
+  const h=(out.shift()||[]).map(x=>(x||"").trim()); // TRIM headers
+  return out.map(r=>Object.fromEntries(h.map((x,j)=>[x,(r[j]||"").trim()])));
+}
+function loadCSV(u){ return fetch(u,{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text();}).then(parseCSV); }
+function extractID(url){ if(!url)return""; url=url.trim(); let m=url.match(/[?&]id=([\w-]+)/); if(m)return m[1]; m=url.match(/\/file\/d\/([\w-]+)/); if(m)return m[1]; if(/^[\w-]{15,}$/.test(url))return url; return""; }
+function candidates(url){ const id=extractID(url); if(!id)return[]; return[`https://drive.google.com/uc?export=view&id=${id}`,`https://drive.google.com/thumbnail?id=${id}&sz=w1200`,`https://lh3.googleusercontent.com/d/${id}=w1200`]; }
+function toPhotos(f){ return (f||"").split(/[\n,]/).map(s=>s.trim()).filter(Boolean).slice(0,MAX_PHOTOS); }
+function hasPhotos(r){ return toPhotos(r["कार्यक्रम के फोटो"]).length>0; }
+function esc(s){ return (s||"").replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function prefetchNext(){
+  const n = (idx+1)%rows.length;
+  const r = rows[n]; if(!r) return;
+  const photos = toPhotos(r["कार्यक्रम के फोटो"]);
+  if(photos[0]){ const tries=candidates(photos[0]); if(tries[0]){ const im=new Image(); im.src=tries[0]; } }
+}
+
+function render(r){
+  const el=document.getElementById('slide');
+  const guests=(r["कार्यक्रम में प्रमुख अतिथि , जनप्रतिनिधि"]||"").split(",").map(s=>s.trim()).filter(Boolean);
+  const photos=toPhotos(r["कार्यक्रम के फोटो"]);
+  el.innerHTML=`
+    <div class="header"><div class="h1">माननीय जिला अध्यक्ष जी का प्रवास कार्यक्रम</div>
+    <div class="meta">${idx+1} / ${rows.length}</div></div>
+    <div class="card"><div class="section">कार्यक्रम विवरण</div>
+      <dl>
+        <dt>तारीख</dt><dd>${esc(r["कार्यक्रम दिनांक"]||"")}</dd>
+        <dt>स्थान</dt><dd>${esc(r["कार्यक्रम स्थान"]||"")}</dd>
+        <dt>मंडल</dt><dd>${esc(r["मंडल का नाम"]||"")}</dd>
+        <dt>प्रकार</dt><dd>${esc(r["कार्यक्रम का प्रकार"]||"")}</dd>
+        <dt>उपस्थिति</dt><dd>${esc(r["कार्यक्रम में कुल उपस्तिथि"]||"")}</dd>
+        <dt>अतिथि</dt><dd>${guests.join(", ")||"—"}</dd>
+      </dl>
+      <div style="margin-top:8px">${esc(r["कार्यक्रम से सम्बंधित अन्य जानकारी संषिप्त में"]||"").replace(/\n/g,"<br>")}</div>
+    </div>
+    <div class="card"><div class="section">फोटो गैलरी</div>
+      <div class="gallery" id="gal"></div>
+    </div>`;
+  const gal=document.getElementById('gal');
+  photos.forEach(u=>{const tries=candidates(u);const img=document.createElement('img');let k=0;img.src=tries[k]||u;img.onerror=()=>{if(++k<tries.length)img.src=tries[k];};gal.appendChild(img);});
+  prefetchNext();
+}
+
+function play(){ if(playing) return; playing=true; tick(); timer=setInterval(next, interval); }
+function pause(){ playing=false; if(timer){clearInterval(timer);timer=null;} }
+function next(){ idx=(idx+1)%rows.length; render(rows[idx]); }
+function prev(){ idx=(idx-1+rows.length)%rows.length; render(rows[idx]); }
+function tick(){ render(rows[idx]); }
+
+function scheduleHide(){ clearTimeout(autoHideTimer); autoHideTimer=setTimeout(()=>document.getElementById('controls').classList.add('hidden'), 3500); }
+function showUI(){ document.getElementById('controls').classList.remove('hidden'); scheduleHide(); }
+['mousemove','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,showUI,{passive:true}));
+document.getElementById('hide').onclick=()=>document.getElementById('controls').classList.toggle('hidden');
+scheduleHide();
+
+function applyPhotoOnly(){
+  rows = photosOnly ? allRows.filter(hasPhotos) : allRows.slice();
+  idx = 0;
+  if(rows.length) render(rows[0]);
+}
+
+document.getElementById('start').onclick=async()=>{
+  try{allRows=await loadCSV(CSV_URL);}catch(e){allRows=await loadCSV(CSV_URL_PROXY);}
+  applyPhotoOnly();
+  if(rows.length===0){alert("CSV खाली है");return;}
+  const s = parseInt(document.getElementById('sec').value||"12",10); interval = Math.max(5, Math.min(60, s))*1000;
+  if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+  checkOrientation(true); play(); restartAutoRefresh();
+};
+document.getElementById('pause').onclick=()=>{ if(playing) pause(); else play(); };
+document.getElementById('next').onclick=next;
+document.getElementById('prev').onclick=prev;
+document.getElementById('photosOnly').onchange=(e)=>{ photosOnly = e.target.checked; applyPhotoOnly(); };
+
+document.addEventListener('keydown',e=>{
+  if(e.key===' '){ e.preventDefault(); if(playing) pause(); else play(); }
+  if(e.key==='ArrowRight') next();
+  if(e.key==='ArrowLeft') prev();
+  if(e.key.toLowerCase()==='f'){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>{}); }
+  if(e.key.toLowerCase()==='n'){ photosOnly=!photosOnly; document.getElementById('photosOnly').checked=photosOnly; applyPhotoOnly(); } // NEW
+});
+
+// Auto‑refresh CSV
+function restartAutoRefresh(){
+  if(refreshTimer){ clearInterval(refreshTimer); refreshTimer=null; }
+  if(document.getElementById('autoRefresh').checked){
+    const m = Math.max(1, Math.min(60, parseInt(document.getElementById('min').value||"5",10)||5));
+    refreshTimer = setInterval(async ()=>{
+      try{ const nr = await loadCSV(CSV_URL).catch(()=>loadCSV(CSV_URL_PROXY)); if(nr?.length){ allRows = nr; applyPhotoOnly(); } }catch(e){}
+    }, m*60*1000);
+  }
+}
+document.getElementById('autoRefresh').onchange=restartAutoRefresh;
+document.getElementById('min').onchange=restartAutoRefresh;
+
+// Orientation overlay (portrait)
+const rot=document.getElementById('rot');
+function checkOrientation(showFirst){
+  const portrait = window.matchMedia("(orientation: portrait)").matches;
+  rot.style.display = portrait ? 'flex' : 'none';
+  if(showFirst && portrait){ pause(); }
+}
+window.addEventListener('orientationchange',()=>{ checkOrientation(false); });
+window.addEventListener('resize',()=>{ checkOrientation(false); });
+document.getElementById('continuePortrait').onclick=()=>{ rot.style.display='none'; play(); };
+document.getElementById('goFullscreen').onclick=()=>{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); };
+
+// --- Deep-link URL parameters: start=1, photos=1, interval=10, refresh=5 ---
+(function(){
+  try{
+    const p = new URLSearchParams(location.search);
+    const start = p.get('start') === '1';
+    const photos = p.get('photos') === '1';
+    const intervalParam = parseInt(p.get('interval')||'', 10);
+    const refreshParam = parseInt(p.get('refresh')||'', 10);
+
+    if (!isNaN(intervalParam) && intervalParam>0){
+      const secEl = document.getElementById('sec'); if (secEl) secEl.value = intervalParam;
+      interval = Math.max(5, Math.min(60, intervalParam)) * 1000;
+    }
+    if (!isNaN(refreshParam) && refreshParam>0){
+      const minEl = document.getElementById('min'); if (minEl) minEl.value = refreshParam;
+      const chk = document.getElementById('autoRefresh'); if (chk) chk.checked = true;
+    }
+    if (photos){
+      const c = document.getElementById('photosOnly'); if (c) c.checked = true;
+      // ensure current filter applied if data already present
+      if (typeof applyPhotoOnly === 'function') { try { applyPhotoOnly(); } catch(e){} }
+    }
+    if (start){
+      // defer to ensure DOM is ready
+      setTimeout(()=>{ const btn=document.getElementById('start'); if(btn) btn.click(); }, 50);
+    }
+  }catch(e){ /* ignore */ }
+})();
+
+</script>
+</body>
+</html>
